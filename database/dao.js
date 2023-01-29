@@ -73,7 +73,7 @@ try{
         quote_number:data.quote_number,
         po_number:data.po_number
     })
-
+    
  return new Response(200,"SUCCESS",`Project created with id ${result.id}.`)
 
 }catch(error){
@@ -84,5 +84,20 @@ try{
 
 }
 
-module.exports = {saveProjectInfo}
+
+async function getAllProjects(){
+  
+    try{
+        const result = await projectInfo.findAll({raw:true})
+        console.log("Data Captured")
+        return result
+    }catch(error){
+        console.log(error)
+        throw error
+    }
+
+}
+
+
+module.exports = {saveProjectInfo,getAllProjects}
 
