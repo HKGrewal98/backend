@@ -53,10 +53,9 @@ async function uploadBlob(file,containerName,blobName){
         }
       const containerClient = await createContainer(containerName)
       const blockBlobClient = containerClient.getBlockBlobClient(blobName)
-      const fileReadStream = fs.createReadStream(file.path)
-      fileReadStream.setEncoding("utf-8")
-      const blockBobResponse = await blockBlobClient.uploadStream(fileReadStream)
-      console.log("Uploaded File : " + blockBobResponse)
+      const fileReadStream = fs.createReadStream(file.path,{encoding:"utf8"})
+      const blockBobResponse = await blockBlobClient.uploadFile(file.path)
+      console.log("Uploaded File : " + JSON.stringify(blockBobResponse))
 
    }catch(error){
         console.log("File Creation error " + error)
@@ -73,7 +72,13 @@ async function downloadBlob(path,containerName,blobName){
         await streamToBuffer(downloadBlockBlobResponse.readableStreamBody,path)
     ).toString();
     // const downloadResponse = await blobClient.downloadToFile(path)
-     console.log("Downloaded blob " + downloaded);
+     console.log("Downloaded blob.");
+
+     const write = fs.writeFileSync('name.docx',downloaded,{encoding:"utf8"})
+
+     await blobClient.downloadToFile('tile.docx')
+
+   
    
     
 
@@ -84,8 +89,10 @@ async function downloadBlob(path,containerName,blobName){
           const chunks = [];
           readableStream.on("data", (data) => {
             chunks.push(data instanceof Buffer ? data : Buffer.from(data));
+           
           });
           readableStream.on("end", () => {
+            console.log("Ending stream.")
             resolve(Buffer.concat(chunks));
           });
           readableStream.on("error", reject);

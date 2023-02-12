@@ -17,9 +17,14 @@ reportRoute.post('/',reportUpload,async (req,res)=>{
        console.log(req.files['report'][0])  
        await azureStorage.uploadBlob(req.files['report'][0],"dummy3","report-01")
        await azureStorage.downloadBlob(path.join(appDir,'/downloads/name.docx'),"dummy3","report-01")
-       fs.unlinkSync(req.files['report'][0].path)
+       //fs.unlinkSync(req.files['report'][0].path)
        await azureStorage.deleteContainer("dummy3")
-       res.json("SUCCESS")
+    //    res.download(req.files['report'][0].path,(err)=>{
+    //        if(err){
+    //         console.log(err)
+    //        }
+    //    })
+    res.json("HOPE")
 })
 
 module.exports = reportRoute
