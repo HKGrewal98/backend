@@ -1,6 +1,6 @@
 const fs = require('fs')
-const { dirname } = require('path');
-const appDir = dirname(require.main.filename);
+const { dirname } = require('path')
+const appDir = dirname(require.main.filename)
 console.log("appDir  : " + appDir)
 
 function createCSV(projects){

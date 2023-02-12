@@ -1,25 +1,17 @@
 const {express} = require('../configuration/server')
-const serviceMethods = require('../service/projectInfo')
-const { dirname } = require('path');
-const appDir = dirname(require.main.filename);
-console.log("appDir  : " + appDir)
+const projectMethods = require('../service/projectService')
 
-const projectRoutes = express.Router()
+const projectRoute = express.Router()
 
-projectRoutes.post('/', (req,res)=>{
-    return serviceMethods.saveProject(req.body,res)
- })
-
- projectRoutes.get('/download', async (req,res)=>{
-    await serviceMethods.downloadFile()
-    return res.download(appDir + '/static/file.csv','ProjectDoc.csv',(err)=>{
-        if(err){
-            res.json("Download Unavailable.")
+projectRoute.use((req,res,next)=>{
+        if(!req.isAuthenticated()){
+            return res.status(401).json({status:"FAILURE",message:"Please login.",isLoggedIn:false})
         }
-        console.log("File sent to the client successfully.")
-    })
- })
+        next()
+})
 
+projectRoute.post('/save',async (req,res)=>{
+      return await projectMethods.saveProject(req.user.userId,req.body,res)
+})
 
-
- module.exports = projectRoutes
+module.exports = projectRoute
