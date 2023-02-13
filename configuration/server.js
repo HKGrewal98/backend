@@ -14,7 +14,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(cors({
   credentials:true,
-  origin:["http://localhost:3000","http://localhost:8081"]
+  origin:["http://localhost:3000","http://localhost:8081"," https://curious-apron-elk.cyclic.app"]
 }))
 app.set("trust proxy", 1);
 
