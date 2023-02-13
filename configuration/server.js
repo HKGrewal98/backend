@@ -12,25 +12,29 @@ const appDir = dirname(require.main.filename)
 const app = express()
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
-app.use(cors())
+app.use(cors({
+  credentials:true,
+  origin:["http://localhost:3000","http://localhost:8081"]
+}))
+app.set("trust proxy", 1);
 
 
-// app.use(
-//     session({
-//       secret: '478269814c199935d534702359a6330baf1113940da72d4b996e29062df1c2c5c04ccaf930329df14667afcb833acebd2a390836d6590311e56640e964f6ca4c',
-//       store: sessionStore,
-//       resave: false,
-//       saveUninitialized:false,
-//       cookie : {maxAge : 1000 * 60 * 30 }
-//     })
-//   );
+app.use(
+    session({
+      secret: '478269814c199935d534702359a6330baf1113940da72d4b996e29062df1c2c5c04ccaf930329df14667afcb833acebd2a390836d6590311e56640e964f6ca4c',
+      store: sessionStore,
+      resave: false,
+      saveUninitialized:false,
+      cookie : {maxAge : 1000 * 60 * 30 ,httpOnly:true}
+    })
+  );
 
-// app.use(cookieParser())
- app.use(passport.initialize())
-// app.use(passport.session())
-// app.use(passport.authenticate('session'))
+app.use(cookieParser())
+app.use(passport.initialize())
+app.use(passport.session())
+//app.use(passport.authenticate('session'))
 
-// sessionStore.sync()
+sessionStore.sync()
 
 const validMimeTypes = ["application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 "application/msword","application/vnd.ms-excel","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
