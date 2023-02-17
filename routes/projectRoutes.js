@@ -14,4 +14,13 @@ projectRoute.post('/save',async (req,res)=>{
       return await projectMethods.saveProject(req.user.userId,req.body,res)
 })
 
+projectRoute.get('/',async (req,res)=> {
+   const {name} = req.query
+   return await projectMethods.getProjectsByName(req.user.userId,name,res)
+})
+
+projectRoute.get('/search',async(req,res)=>{
+    return await projectMethods.getManufactureOrProjectInfo(req,res)
+})
+
 module.exports = projectRoute

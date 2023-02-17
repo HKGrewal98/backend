@@ -73,6 +73,15 @@ project.belongsTo(user,{
 })
 
 project.belongsTo(manufacturer,{
+    as:'projects_fk',
+    foreignKey:{
+        name:'transacting_customer',
+        allowNull:false
+    }
+})
+
+manufacturer.hasMany(project,{
+    as:'projects_fk',
     foreignKey:{
         name:'transacting_customer',
         allowNull:false

@@ -76,77 +76,13 @@ loginApp.post('/signUp',async (req,res)=>{
 
 
 loginApp.post('/login',passport.authenticate('local'),(req,res)=>{  
-     req.session.save()
+      req.session.save()
       res.header('Access-Control-Allow-Credentials', 'true');
-     res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
      res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     //  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
-     console.log("Cookie",req.cookies)
-     res.json({status:"SUCCESS",message:"User is Logged in.",data:{...req.session.passport.user,isLoggedIn:true}})
+      console.log("Cookie",req.cookies)
+      res.json({status:"SUCCESS",message:"User is Logged in.",data:{...req.session.passport.user,isLoggedIn:true}})
 })
-
-
-// async function verifyJWT(req,res,next){
-
-//     const accessToken = req.header('Authorization')
-
-//     try{
-//           const payload = jwt.verify(accessToken,key)
-//           const user = await db.getUserById(payload.userId)
-//           if(!user){
-//             return res.status(401).json({status:"FAILURE",message:"Invalid Token."})
-//           }
-//           req.userId = user.id
-//           req.user = user
-//     }catch{
-//       return res.status(401).json({status:"FAILURE",message:"Please LogIn/Invalid Token."})
-//     }
-//         next()
-// }
-
-
-
-
-// loginApp.post('/login',async (req,res)=>{
-
-//       const {userId,password} = req.body
-//       const user = await db.getUserById(userId)
-//       if(!user){
-//          res.status(400).json({status:"FAILURE",message:"User Does not Exist."})
-//       }
-
-//       const comparePassword = bcrypt.compareSync(password,user.password)
-//       if(!comparePassword){
-//          res.status(400).json({status:"FAILURE",message:"Password Mismatch."})
-//       }
-
-//       const data = {
-//         userId : user.id,
-//         is_engineer : user.is_engineer,
-//         is_reviewer : user.is_reviewer,
-//         name:user.name,
-//         accessToken : createJWTToken(user.id)
-
-//       }
-//       req.login(user,function(err){
-//         if(err){
-//             console.log(err)
-//         }
-//       })
-
-//       res.json({status:"SUCCESS",...data})
-// })
-
-//  function createJWTToken(userId){    
-//     const payload = {
-//         userId:userId
-//     }
-
-//     const token =  jwt.sign(payload,key,{expiresIn:3600})
-//     return token
-// }
-
-
 
 loginApp.post('/logout',(req,res)=>{    
      req.session.destroy(function(err){
@@ -166,12 +102,27 @@ loginApp.get('/',authenticate,(req,res)=>{
 
 loginApp.post('/merchant',async (req,res)=>{
     const response =  await db.saveManufacturer(req.body)
+    return createResponse(response,res)   
+})
 
+loginApp.get('/merchant',async (req,res)=>{
+    const {name,id} = req.query
+    const response = await db.getManufactureNameOrId(name,id);
+    return createResponse(response,res)
+})
+
+loginApp.get('/search',async (req,res)=>{
+    const {name,id} = req.query
+    const response = await db.getUserByNameOrId(name,id);
+    return createResponse(response,res)
+})
+
+function createResponse(response,res){
     if(response.getStatusCode() === 200){
         return res.json(response.getSuccessObject())
     }
     res.json(response.getErrorObject())
-})
+}
 
    
 
