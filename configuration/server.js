@@ -13,9 +13,11 @@ const alphanumeric = require('alphanumeric-id')
 const app = express()
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
+app.use(cookieParser())
 app.use(cors({
   credentials:true,
-  origin:["http://localhost:3000","http://localhost:8081"," https://curious-apron-elk.cyclic.app"]
+  origin:["http://localhost:3000","http://localhost:8081"," https://curious-apron-elk.cyclic.app"],
+  optionsSuccessStatus:200
 }))
 app.set("trust proxy", 1);
 
@@ -30,7 +32,7 @@ app.use(
     })
   );
 
-app.use(cookieParser())
+
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(passport.authenticate('session'))
