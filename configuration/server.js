@@ -8,6 +8,7 @@ const multer = require('multer')
 const {dirname}  = require('path')
 const path  = require('path')
 const appDir = dirname(require.main.filename)
+const alphanumeric = require('alphanumeric-id')
 
 const app = express()
 app.use(express.json())
@@ -34,7 +35,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(passport.authenticate('session'))
 
-sessionStore.sync()
+//sessionStore.sync()
 
 const validMimeTypes = ["application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 "application/msword","application/vnd.ms-excel","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
@@ -45,7 +46,7 @@ const storage = multer.diskStorage({
   },
   filename:function(req,file,cb){
     console.log(file.mimetype)
-    cb(null,file.originalname)
+    cb(null,alphanumeric(9)+file.originalname)
   }
 })
 
@@ -54,7 +55,7 @@ const upload = multer({
   storage:storage,
   fileFilter:function(req,file,cb){
       const valid = validMimeTypes.filter(mime => mime.toLowerCase() === file.mimetype.toLowerCase())
-
+      console.log("In file filter")
       if(valid.length===0){
           return cb(null,false)
       }

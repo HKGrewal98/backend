@@ -88,6 +88,6 @@ manufacturer.hasMany(project,{
     }
 })
 
-project.sync()
+//project.sync()
 
 module.exports = project

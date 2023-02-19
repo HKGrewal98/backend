@@ -78,13 +78,14 @@ loginApp.post('/signUp',async (req,res)=>{
 loginApp.post('/login',passport.authenticate('local'),(req,res)=>{  
       req.session.save()
       res.header('Access-Control-Allow-Credentials', 'true');
-     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+      res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    //  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');   
     //  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
       console.log("Cookie",req.cookies)
       res.json({status:"SUCCESS",message:"User is Logged in.",data:{...req.session.passport.user,isLoggedIn:true}})
 })
 
-loginApp.post('/logout',(req,res)=>{    
+loginApp.post('/logout',authenticate,(req,res)=>{    
      req.session.destroy(function(err){
         res.clearCookie("connect.sid")
         if(err){
@@ -100,18 +101,18 @@ loginApp.get('/',authenticate,(req,res)=>{
 })
 
 
-loginApp.post('/merchant',async (req,res)=>{
+loginApp.post('/merchant',authenticate,async (req,res)=>{
     const response =  await db.saveManufacturer(req.body)
     return createResponse(response,res)   
 })
 
-loginApp.get('/merchant',async (req,res)=>{
+loginApp.get('/merchant',authenticate,async (req,res)=>{
     const {name,id} = req.query
     const response = await db.getManufactureNameOrId(name,id);
     return createResponse(response,res)
 })
 
-loginApp.get('/search',async (req,res)=>{
+loginApp.get('/search',authenticate,async (req,res)=>{
     const {name,id} = req.query
     const response = await db.getUserByNameOrId(name,id);
     return createResponse(response,res)
