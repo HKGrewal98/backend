@@ -16,7 +16,7 @@ app.use(express.urlencoded({extended:true}))
 app.use(cookieParser())
 app.use(cors({
   credentials:true,
-  origin:["http://localhost:3000","http://localhost:8081"," https://curious-apron-elk.cyclic.app"],
+  origin:["http://localhost:3000","http://localhost:8081"," https://curious-apron-elk.cyclic.app","https://alphacoderz.cyclic.app"],
   optionsSuccessStatus:200
 }))
 app.set("trust proxy", 1);

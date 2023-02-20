@@ -77,11 +77,16 @@ loginApp.post('/signUp',async (req,res)=>{
 
 loginApp.post('/login',passport.authenticate('local'),(req,res)=>{  
       req.session.save()
-      res.header('Access-Control-Allow-Origin','http://localhost:3000')
+      //res.header('Access-Control-Allow-Origin','http://localhost:3000')
+     
+      res.header('Access-Control-Allow-Origin',req.headers.host)
       res.header('Access-Control-Allow-Credentials', 'true');
       res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       console.log("Cookie",req.cookies)
+      console.log("O",req.headers.origin)
+      console.log("H",req.headers.host)
+      console.log("L",req.headers.location)
       res.json({status:"SUCCESS",message:"User is Logged in.",data:{...req.session.passport.user,isLoggedIn:true}})
 })
 

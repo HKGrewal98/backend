@@ -86,6 +86,18 @@ async function getProjectByName(name,id,userId){
 
 }
 
+async function getAllProjectInfo(id){
+
+    try{
+        const result = project.findByPk(id,{
+            
+        })
+    }catch(error){
+
+    }
+
+}
+
 
 module.exports = {saveProject,getProjectByName}
 

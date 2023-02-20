@@ -38,4 +38,8 @@ projectRoute.get('/search',async(req,res)=>{
     return await projectMethods.getManufactureOrProjectInfo(req,res)
 })
 
+projectRoute.get('/:id',async (req,res)=>{
+    const {id} = req.query
+})
+
 module.exports = projectRoute
