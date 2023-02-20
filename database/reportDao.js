@@ -4,6 +4,8 @@ const Response = require('../service/customResponse')
 const document = require('../models/Document')
 const sequelize = require('../database/DBConnection')
 const { QueryTypes } = require('sequelize');
+const {Op} = require('sequelize')
+const project = require('../models/Project')
 
 async function saveReport(body,userId){
 
@@ -81,5 +83,38 @@ async function getReportsWithStatusCount(){
 }
 
 
+async function getProjectLinkedToReports(reportId,userId){
 
-module.exports = {saveReport,saveDocument,getReportsWithStatusCount}
+    try{
+        
+        const result = await report.findAll({
+            where:{
+                [Op.and] : [
+                    {created_by:{[Op.eq]:userId}},
+                    {[Op.or] : [
+                        {report_number:{[Op.like]:`${reportId}%`}},
+                        {report_number:{[Op.like]:`%${reportId}%`}},
+                        {report_number:{[Op.like]:`%${reportId}`}},
+                    ]}
+                ],
+            },
+            attributes : ['report_number'],
+            include:{
+                model:project,
+                as:"project_number_fk",
+                attributes:["project_number","project_name"]
+            }
+        })
+
+        return new Response(200,"SUCCESS",`Projects Linked to reportId ${reportId}`,result)
+        
+
+    }catch(error){
+             console.log("Error in fetching projects linked to a report " + error)
+             return new Response(500,"FAILURE","Unknown error occured.",null)
+    }
+
+}
+
+
+module.exports = {saveReport,saveDocument,getReportsWithStatusCount,getProjectLinkedToReports}

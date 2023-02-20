@@ -1,5 +1,6 @@
 const projectDao = require('../database/projectDao')
 const userDao = require('../database/userDao')
+const reportDao = require('../database/reportDao')
 const Response = require('./customResponse')
 
 
@@ -17,25 +18,31 @@ async function getProjectsByName(userId,name,res){
 }
 
 async function getManufactureOrProjectInfo(req,res){
-const {projectId,reportId,name,id} = req.query
 
-if(!projectId && !reportId && !name && !id){
-    return res.status(400).json((new Response(400,"SUCCESS","projectId or reportId or name or id fields missing in req query params.",null).getErrorObject()))
-}
+    const {projectId,reportId,name,id} = req.query
 
-let response;
+    if(!projectId && !reportId && !name && !id){
+        return res.status(400).json((new Response(400,"SUCCESS","projectId or reportId or name or id fields missing in req query params.",null).getErrorObject()))
+    }
 
-console.log("Get Request getManufactureOrProjectInfo ==> " + JSON.stringify(req.query))
+    let response;
 
-if(projectId){
-    response = await projectDao.getProjectByName(null,projectId,req.user.userId)
-    return createResponse(response,res)
-}
+    console.log("Get Request getManufactureOrProjectInfo ==> " + JSON.stringify(req.query))
 
-if(name || id){
-    response = await userDao.getProjectByManufactureNameOrId(name,id)
-    return createResponse(response,res)
-  }
+    if(projectId){
+        response = await projectDao.getProjectByName(null,projectId,req.user.userId)
+        return createResponse(response,res)
+    }
+
+    if(reportId){
+        response = await reportDao.getProjectLinkedToReports(reportId,req.user.userId)
+        return createResponse(response,res)
+    }
+
+    if(name || id){
+        response = await userDao.getProjectByManufactureNameOrId(name,id)
+        return createResponse(response,res)
+    }
 }
 
 function createResponse(response,res){
