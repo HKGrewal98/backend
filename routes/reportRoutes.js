@@ -14,7 +14,7 @@ const reportUpload = upload.fields([{name:'report',maxCount:1},{name:'certificat
 reportRoute.all('*',(req,res,next)=>{
      return req.isAuthenticated() ?
      next() :  
-     res.json({status:"FAILURE",message:"Please LogIn.",isLoggedIn:false})
+     res.status(401).json({status:"FAILURE",message:"Please LogIn.",isLoggedIn:false})
 })
 
 reportRoute.get('/',async (req,res)=> {

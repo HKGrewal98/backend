@@ -59,7 +59,7 @@ passport.deserializeUser(function(user,cb){
 function authenticate(req,res,next){
     return req.isAuthenticated() ?
     next() :  
-    res.json({status:"FAILURE",message:"Please LogIn.",isLoggedIn:false})
+    res.status(401).json({status:"FAILURE",message:"Please LogIn.",isLoggedIn:false})
 }
 
 

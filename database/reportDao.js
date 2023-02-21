@@ -106,7 +106,9 @@ async function getProjectLinkedToReports(reportId,userId){
             }
         })
 
-        return new Response(200,"SUCCESS",`Projects Linked to reportId ${reportId}`,result)
+        const projects = result.map((data) => data.project_number_fk)
+
+        return new Response(200,"SUCCESS",`Projects Linked to reportId ${reportId}`,projects)
         
 
     }catch(error){

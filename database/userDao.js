@@ -91,8 +91,16 @@ async function getProjectByManufactureNameOrId(name,id){
         }
     },{raw:true})
 
+    let projects = []
 
-    return new Response(200,"SUCCESS","Manufacture Id and name search.",result)
+    for(let i=0 ; i<result.length ; i++){
+        const projects_fk = result[i].dataValues.projects_fk
+        for(let j=0 ; j<projects_fk.length ; j++){
+            projects.push(projects_fk[j].dataValues)
+        }
+    }
+ 
+    return new Response(200,"SUCCESS","Manufacture Id and name search.",projects)
    }catch(error){
        console.log("User Dao || Getting Manufacture based on name and id " + error)
        return new Response(500,"FAILURE","Unknown error occured.",null)
