@@ -1,15 +1,27 @@
 import React from 'react'
-import "./Reviewreports.css"
-const Reviewreports = () => {
+import { NavLink } from 'react-router-dom'
+import "./ViewReportScreen.css"
+const ViewReportsScreen = () => {
   return (
     <div>
     
-<div className='ReviewReports'>
-<svg width="50" height="38" viewBox="-11 -2  40 25 " fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M1.5625 21C1.5625 21.8789 2.24609 22.5625 3.125 22.5625H21.875C22.7051 22.5625 23.4375 21.8789 23.4375 21V6.9375H1.5625V21ZM9.375 10.6484C9.375 10.3555 9.61914 10.0625 9.96094 10.0625H15.0391C15.332 10.0625 15.625 10.3555 15.625 10.6484V11.0391C15.625 11.3809 15.332 11.625 15.0391 11.625H9.96094C9.61914 11.625 9.375 11.3809 9.375 11.0391V10.6484ZM23.4375 0.6875H1.5625C0.683594 0.6875 0 1.41992 0 2.25V4.59375C0 5.0332 0.341797 5.375 0.78125 5.375H24.2188C24.6094 5.375 25 5.0332 25 4.59375V2.25C25 1.41992 24.2676 0.6875 23.4375 0.6875Z" fill="white"/>
-</svg>
-    
-<section> Review Reports</section>
+<div className='ReviewReports py-2'>
+<NavLink className="leftHBar" to="">
+         <svg
+           width="25"
+           height="23"
+           viewBox="0 0 25 23"
+           fill="none"
+           xmlns="http://www.w3.org/2000/svg"
+         >
+           <path
+             d="M1.5625 21C1.5625 21.8789 2.24609 22.5625 3.125 22.5625H21.875C22.7051 22.5625 23.4375 21.8789 23.4375 21V6.9375H1.5625V21ZM9.375 10.6484C9.375 10.3555 9.61914 10.0625 9.96094 10.0625H15.0391C15.332 10.0625 15.625 10.3555 15.625 10.6484V11.0391C15.625 11.3809 15.332 11.625 15.0391 11.625H9.96094C9.61914 11.625 9.375 11.3809 9.375 11.0391V10.6484ZM23.4375 0.6875H1.5625C0.683594 0.6875 0 1.41992 0 2.25V4.59375C0 5.0332 0.341797 5.375 0.78125 5.375H24.2188C24.6094 5.375 25 5.0332 25 4.59375V2.25C25 1.41992 24.2676 0.6875 23.4375 0.6875Z"
+             fill="white"
+           />
+         </svg>
+       
+       <div className="textHome mx-2 text-white">Review Reports</div>
+       </NavLink>
 
 </div>
 
@@ -191,4 +203,4 @@ const Reviewreports = () => {
   )
 }
 
-export default Reviewreports
+export default ViewReportsScreen

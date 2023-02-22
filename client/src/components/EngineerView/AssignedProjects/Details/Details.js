@@ -2,7 +2,7 @@ import React from 'react'
 import { useForm } from "react-hook-form";
 import axios from 'axios'
 
-export const Form = () => {
+export const Details = () => {
     const { register, handleSubmit, watch, formState: { errors } } = useForm();
     const onSubmit = data => {
       
@@ -26,11 +26,12 @@ export const Form = () => {
     };
   
   return (
-    <div classname = "App">    
-    <title>Add Document</title>
+   
 <div className="main-block">
 
-    <h1 className='custom-addDoc'>Add Document</h1>
+<div className='Adddocument'>
+<button>ADD DOCUMENT</button>   
+ </div>
     <form type="submit"onSubmit={handleSubmit(onSubmit)} className='custom-container'>
         <div className='form-container'>
     <div className='custom-noname'>
@@ -102,6 +103,6 @@ export const Form = () => {
     </form>
     
     </div>
-    </div> 
+    
   )
 }
