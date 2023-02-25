@@ -22,7 +22,12 @@ reportRoute.get('/',async (req,res)=> {
 })
 
 reportRoute.post('/',reportUpload,async (req,res)=>{ 
+      console.log(req.files['report'])
       return await reportService.saveReport(req,res)
+})
+
+reportRoute.get('/download/:fileId',async(req,res)=>{
+      return await reportService.downloadDocumentRelatedToReport(req.params.fileId,res)
 })
 
 module.exports = reportRoute
