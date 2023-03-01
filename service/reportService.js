@@ -13,13 +13,28 @@ const IllegalStateError = require('./errors/IllegalStateError')
 const { dirname } = require('path')
 const appDir = dirname(require.main.filename)
 const path = require('path')
+const reveiwerService = require('../service/reveiwerService')
 
+
+function validateRequest(req){
+  const {report_name,receiving_customer,reviewer_id,project_number} = req.body
+
+  return !(report_name&&receiving_customer&&reviewer_id&&project_number)
+
+}
 
 async function saveReport(req,res){
+
+    
 
     const {hasReport=false, hasCertificate = false,report_type,certificate_type} = req.body
 
     try{
+
+      if(validateRequest(req)){
+        return res.status(400).json((new Response(400,"FALIURE",
+        "report_name,receiving_customer,reviewer_id,project_number are required fields. Some or all are missing",null)).getErrorObject())
+      }
 
       const result  = await sequelize.transaction(async (t1)=>{
             const userId = req.user.userId
@@ -139,8 +154,15 @@ function verifyDocumentsStatus(isPresent,file,type){
 }
 
 
-async function getReportsWithStatusCount(res){
-   const response = await reportDao.getReportsWithStatusCount()
+function isEngineer(req){
+    return req.user.is_engineer
+}
+
+async function getReportsWithStatusCount(req,res){
+   if(!isEngineer(req)){
+    return reveiwerService.getReveiwerWorkStatus(req,res)
+   }
+   const response = await reportDao.getReportsWithStatusCount(req.user.userId)
    return createResponse(response,res)
 }
 

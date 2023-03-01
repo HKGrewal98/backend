@@ -74,10 +74,11 @@ async function saveDocument(userId,reportId,type,blobName,originalName,subTypeId
     } 
 }
 
-async function getReportsWithStatusCount(){
+async function getReportsWithStatusCount(userId){
     try{
         const users = await sequelize.query("select count(*) as 'count' , r.status_id as 'statusId' , s.name as 'statusName'" + 
-        "from report r inner join status_type s on r.status_id = s.id group by status_id", { type: QueryTypes.SELECT , raw:true });
+        "from report r inner join status_type s on r.status_id = s.id where r.created_by=? group by status_id", 
+        { type: QueryTypes.SELECT , raw:true ,replacements:[userId]});
 
         return new Response(200,"SUCCESS","Engineer Reports Status Count",users)
     }catch(error){
@@ -123,19 +124,20 @@ async function getProjectLinkedToReports(reportId,userId){
 
 }
 
-async function getAllReportsBasedOnDocumentType(projectId,screenId,userId){
+async function getAllReportsBasedOnDocumentType(projectId,screenId,req){
 
+    const {limit,offset} = getLimitAndOffset(req)
     
     let query = `select r.report_number , r.tags , r.comments as 'report_comments' , r.receiving_customer , r.reviewer_id , r.project_number , r.documents_uploaded,
     r.created_at as 'report_created_at' , d.file_id  , d.original_file_name , d.type as 'file_type' ,
      d.submitted_by as 'file_uploaded_by', dt.name as 'file_sub_type' , st.name as 'report_status' from report r inner join report_documents d 
     on r.report_number = d.report_id inner join document_type dt on d.sub_type = dt.id inner join status_type st on
-    st.id = r.status_id where r.project_number=? and r.is_saved=? and d.sub_type in (?) and r.created_by=?`
+    st.id = r.status_id where r.project_number=? and r.is_saved=? and d.sub_type in (?) limit ? offset ?`
 
     try{
         const result = await sequelize.query(query,
         {
-            replacements:[projectId,true,screenId,userId],
+            replacements:[projectId,true,screenId,parseInt(limit),parseInt(offset)],
             type:QueryTypes.SELECT,
             raw:true
         })
@@ -149,17 +151,19 @@ async function getAllReportsBasedOnDocumentType(projectId,screenId,userId){
 }
 
 
-async function getReportsWithNoDocumentsUploaded(projectId,userId){
+async function getReportsWithNoDocumentsUploaded(projectId,req){
+       
+    const {limit,offset} = getLimitAndOffset(req)
 
     try{
 
         let query = `select report_number , tags , comments as 'report_comments' , receiving_customer , reviewer_id , project_number,
         documents_uploaded, created_at as 'report_created_at' from report  where project_number=? and is_saved=? 
-        and documents_uploaded=? and created_by=?`
+        and documents_uploaded=? limit ? offset ?`
 
         const result = await sequelize.query(query,
             {
-                replacements:[projectId,true,false,userId],
+                replacements:[projectId,true,false,parseInt(limit),parseInt(offset)],
                 type:QueryTypes.SELECT,
                 raw:true
             })
@@ -181,6 +185,24 @@ async function getDocumentBasedOnFileId(fileId){
      return new Response(500,"FAILURE","Unknown error occured.",null)   
     }
 
+}
+
+function getLimitAndOffset(req){
+
+    let {limit,offset} = req.query
+
+    if(!limit || isNaN(limit)){
+        limit = 10
+    }
+
+    if(!offset || isNaN(offset)){
+        offset=0
+    }
+    
+    return {
+        limit:limit,
+        offset:offset
+    }
 }
 
 
