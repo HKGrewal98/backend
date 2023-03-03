@@ -6,6 +6,7 @@ const fs = require('fs')
 const { dirname } = require('path')
 const appDir = dirname(require.main.filename)
 const path = require('path')
+console.log("path : " + appDir)
 
 
 app.use(express.static(path.join(__dirname, "./client/build")));

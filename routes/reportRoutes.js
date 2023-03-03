@@ -11,6 +11,7 @@ const reportStatus = require('../models/ReportStatus')
 
 const reportRoute = express.Router()
 const reportUpload = upload.fields([{name:'report',maxCount:1},{name:'certificate',maxCount:1}])
+const editUpload = upload.single('file')
 
 reportRoute.all('*',(req,res,next)=>{
      return req.isAuthenticated() ?
@@ -37,5 +38,26 @@ reportRoute.get('/download/:fileId',async(req,res)=>{
       return await reportService.downloadDocumentRelatedToReport(req.params.fileId,res)
 })
 
+reportRoute.put('/upload',editUpload,async(req,res)=>{
+       return await reportService.updateDocument(req,res)
+})
+
+reportRoute.put('/delete',async (req,res)=>{
+      return await reportService.deleteDocument(req,res)
+})
+
 
 module.exports = reportRoute
+
+// decision
+// report_id
+
+// comments
+
+// deleteBlob  ==> fileId(delete),reportId // if file count 0 
+//                                          delete the container/update documents_uploaded=false in reports table
+//                                   else
+//                                          delete the blob
+
+// updateBlob ==> fileId,subType==>blob(update)
+ 
