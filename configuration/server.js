@@ -17,9 +17,9 @@ const validMimeTypes = ["application/vnd.openxmlformats-officedocument.wordproce
 "application/msword","application/vnd.ms-excel","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
 
 const storage = multer.diskStorage({
-  destination: function(req,file,cb){
-    cb(null,os.tmpdir())
-  },
+  // destination: function(req,file,cb){
+  //   cb(null,os.tmpdir())
+  // },
   filename:function(req,file,cb){
     console.log(file.mimetype)
     cb(null,alphanumeric(9)+file.originalname)

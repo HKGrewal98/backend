@@ -188,12 +188,13 @@ async function downloadDocumentRelatedToReport(fileId,res){
     const blobName = report.storage_file_name
     const fileName = blobName+report.original_file_name
     console.log("Root " + os.tmpdir())
-    const filePath =  path.join(os.tmpdir(),'downloads',`${fileName}`)
-    await azureStorage.downloadBlob(containerName,blobName,filePath)
-    setTimeout(()=>{
-          deleteFilesFromLocal(filePath)
-    },10000)
-    return res.download(filePath)
+    const filePath =  path.join(os.tmpdir(),`${fileName}`)
+    let readStream = await azureStorage.downloadBlob(containerName,blobName,filePath)
+    // setTimeout(()=>{
+    //       deleteFilesFromLocal(filePath)
+    // },10000)
+    res.attachment(`${report.original_file_name}`);
+    return readStream.readableStreamBody.pipe(res)
 }
 
 async function updateDocument(req,res){
