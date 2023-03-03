@@ -186,7 +186,7 @@ async function downloadDocumentRelatedToReport(fileId,res){
     const containerName = (report.report_id).toLowerCase()
     const blobName = report.storage_file_name
     const fileName = blobName+report.original_file_name
-    const filePath = `downloads/${fileName}`
+    const filePath = `/temp/${fileName}`
     await azureStorage.downloadBlob(containerName,blobName,filePath)
     setTimeout(()=>{
           deleteFilesFromLocal(filePath)

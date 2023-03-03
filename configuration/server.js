@@ -17,7 +17,7 @@ const validMimeTypes = ["application/vnd.openxmlformats-officedocument.wordproce
 
 const storage = multer.diskStorage({
   destination: function(req,file,cb){
-    cb(null,'static/')
+    cb(null,'/tmp')
   },
   filename:function(req,file,cb){
     console.log(file.mimetype)
@@ -36,7 +36,8 @@ const upload = multer({
       }
       
       cb(null,true)
-  }
+  },
+  preservePath:""
 }) 
 
 
