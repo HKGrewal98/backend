@@ -11,7 +11,7 @@ const os = require('os')
 
 console.log(" OS "+os.tmpdir())
 
-//app.use(express.static(path.join(__dirname, "./client/build")))
+app.use(express.static(path.join(__dirname, "./client/build")))
 
 app.use('/user',userRoutes)
 app.use('/project',projectRoutes)
@@ -31,9 +31,9 @@ async function createStaticFolders(){
 
 //createStaticFolders()
 
-// app.get("/*", function (req, res) {
-//   res.sendFile(path.resolve(__dirname, './client/build', 'index.html'));
-// })
+app.get("/*", function (req, res) {
+  res.sendFile(path.resolve(__dirname, './client/build', 'index.html'));
+})
 
 app.listen(8081,()=>{
     console.log("Server up and running at port 8081.")

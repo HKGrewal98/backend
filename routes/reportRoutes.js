@@ -13,11 +13,11 @@ const reportRoute = express.Router()
 const reportUpload = upload.fields([{name:'report',maxCount:1},{name:'certificate',maxCount:1}])
 const editUpload = upload.single('file')
 
-// reportRoute.all('*',(req,res,next)=>{
-//      return req.isAuthenticated() ?
-//      next() :  
-//      res.status(401).json({status:"FAILURE",message:"Please LogIn.",isLoggedIn:false})
-// })
+reportRoute.all('*',(req,res,next)=>{
+     return req.isAuthenticated() ?
+     next() :  
+     res.status(401).json({status:"FAILURE",message:"Please LogIn.",isLoggedIn:false})
+})
 
 function isEngineer(req,res,next){
       return req.user.is_engineer?
