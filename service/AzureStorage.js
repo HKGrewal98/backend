@@ -64,9 +64,9 @@ async function getAllBlobs(containerName){
 
 async function uploadBlob(file,containerName,blobName,containerClient){
    console.log("Uploading file with container Name " + containerName + " and blob name " + blobName) 
-
+   const readStream = fs.createReadStream(file.path)
     try{
-      const readStream = fs.createReadStream(file.path)
+      
       const blobOptions = {
             blobHTTPHeaders:{
                 blobContentType:file.mimetype
@@ -81,6 +81,7 @@ async function uploadBlob(file,containerName,blobName,containerClient){
         console.log("Azure Storage || File Creation error " + error)
         throw error
    }finally{
+          readStream.destroy()
           fs.unlink(file.path,(err)=>{
             console.log("Deleting uploaded file from local storage.")
             if(err){
