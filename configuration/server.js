@@ -9,6 +9,7 @@ const {dirname}  = require('path')
 const path  = require('path')
 const appDir = dirname(require.main.filename)
 const alphanumeric = require('alphanumeric-id')
+const os = require('os')
 
 const app = express()
 
@@ -17,7 +18,7 @@ const validMimeTypes = ["application/vnd.openxmlformats-officedocument.wordproce
 
 const storage = multer.diskStorage({
   destination: function(req,file,cb){
-    cb(null,'../tmp')
+    cb(null,os.tmpdir())
   },
   filename:function(req,file,cb){
     console.log(file.mimetype)
