@@ -21,12 +21,12 @@ async function createStaticFolders(){
     const downloadedFiles=fs.readdirSync(path.join(appDir,'/downloads'),{withFileTypes:true})
     downloadedFiles.forEach((file)=>fs.unlinkSync(path.join(appDir,'/downloads',`/${file.name}`)))
    }catch(error){
-          fs.mkdirSync(path.join(appDir,'/static'),{mode:0777})
-          fs.mkdirSync(path.join(appDir,'/downloads'),{mode:0777})
+          fs.mkdirSync('static/',{mode:0777})
+          fs.mkdirSync('downloads/',{mode:0777})
    }
 }
 
-//createStaticFolders()
+createStaticFolders()
 
 app.get("/*", function (req, res) {
   res.sendFile(path.resolve(__dirname, './client/build', 'index.html'));
