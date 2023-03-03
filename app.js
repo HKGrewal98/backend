@@ -8,16 +8,7 @@ const appDir = dirname(require.main.filename)
 const path = require('path')
 console.log("path : " + appDir)
 
-
-app.use(express.static(path.join(__dirname, "./client/build")));
-app.get("*", function (_, res) {
-  res.sendFile(
-    path.join(__dirname, "./client/build/index.html"),
-    function (err) {
-      res.status(500).send(err);
-    }
-  );
-});
+app.use(express.static(path.join(__dirname, "./client/build")))
 
 app.use('/user',userRoutes)
 app.use('/project',projectRoutes)
@@ -37,6 +28,9 @@ async function createStaticFolders(){
 
 createStaticFolders()
 
+app.get("/*", function (req, res) {
+  res.sendFile(path.resolve(__dirname, './client/build', 'index.html'));
+})
 
 app.listen(8081,()=>{
     console.log("Server up and running at port 8081.")
