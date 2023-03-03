@@ -6,13 +6,18 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Cookies from 'universal-cookie'
+import { useDispatch } from "react-redux";
+import { LoginDetails } from "../../Login/LoginReducer/LoginSlice";
 
 export const MainSearchBox = () => {
   const [show, setShow] = useState(false);
   const [searchResult, setSearchResult] = useState()
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const dispatch = useDispatch()
   const navigate = useNavigate()
+  const cookies = new Cookies()
   const {
     register,
     handleSubmit,
@@ -28,7 +33,7 @@ export const MainSearchBox = () => {
   }
   const onSubmit = (data) => {
     removeEmptyFields(data);
-    console.log(data);
+    // console.log(data);
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append('Access-Control-Allow-Origin', 'http://localhost:8081')
@@ -46,25 +51,29 @@ export const MainSearchBox = () => {
         withCredentials:true,
     })
     .then(function (response) {
-      console.log(response.data);
+      // console.log(response.data);
       setShow(true)
       setSearchResult(response.data?.data)
       if(response.data?.isLoggedIn == false){
-        alert(response.data?.message)
+        cookies.remove('connect.sid')
+      dispatch(LoginDetails({}))
+      localStorage.setItem("AlertMessage", JSON.stringify("Session Expired...Please Login Again"))
         navigate('/')
       }
     })
     .catch(function (error) {
       console.log("Error block", error);
-      if(error?.response?.data?.isLoggedIn == false){
-        alert(error?.responsp.data?.message)
-        navigate('/')
+      if(error?.response?.status===401){
+        dispatch(LoginDetails({}));
+            cookies.remove('connect.sid');
+            localStorage.setItem("AlertMessage", JSON.stringify("Session Expired...Please Login Again"))
+          navigate('/')
       }
      
     });
   };
   
- useEffect(()=>{console.log("search result check", searchResult)},[searchResult])
+//  useEffect(()=>{console.log("search result check", searchResult)},[searchResult])
  const showProject=(project_name)=>{
   localStorage.setItem("ProjectName",JSON.stringify(project_name))
   navigate('/engineerView/assignedProjects')
