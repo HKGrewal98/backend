@@ -7,6 +7,9 @@ const { dirname } = require('path')
 const appDir = dirname(require.main.filename)
 const path = require('path')
 console.log("path : " + appDir)
+const os = require('os')
+
+console.log(" OS "+os.tmpdir())
 
 app.use(express.static(path.join(__dirname, "./client/build")))
 

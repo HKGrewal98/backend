@@ -15,6 +15,7 @@ const appDir = dirname(require.main.filename)
 const path = require('path')
 const reveiwerService = require('../service/reveiwerService')
 const FileType = require('../service/staticData/FileType')
+const os = require('os')
 
 
 function validateRequest(req){
@@ -187,7 +188,7 @@ async function downloadDocumentRelatedToReport(fileId,res){
     const blobName = report.storage_file_name
     const fileName = blobName+report.original_file_name
     console.log("Root " + appDir)
-    const filePath =  path.join('tmp/',`${fileName}`)
+    const filePath =  path.join(os.tmpdir(),`${fileName}`)
     await azureStorage.downloadBlob(containerName,blobName,filePath)
     setTimeout(()=>{
           deleteFilesFromLocal(filePath)
