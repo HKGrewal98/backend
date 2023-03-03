@@ -193,7 +193,7 @@ async function downloadDocumentRelatedToReport(fileId,res){
     setTimeout(()=>{
           deleteFilesFromLocal(filePath)
     },10000)
-    res.attachment(`${report.original_file_name}`);
+    //res.attachment(`${report.original_file_name}`);
     return res.download(filePath)
 }
 
