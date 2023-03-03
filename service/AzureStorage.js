@@ -74,7 +74,7 @@ async function uploadBlob(file,containerName,blobName,containerClient){
         }
 
       const blockBlobClient = containerClient.getBlockBlobClient(blobName)
-      const blockBobResponse = await blockBlobClient.uploadStream(readStream,blobOptions)
+      const blockBobResponse = await blockBlobClient.uploadStream(readStream)
       console.log("Uploaded File : " + JSON.stringify(blockBobResponse) + " in container " + containerName + " with name " + blobName)
 
    }catch(error){
