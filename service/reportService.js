@@ -189,12 +189,14 @@ async function downloadDocumentRelatedToReport(fileId,res){
     const fileName = blobName+report.original_file_name
     console.log("Root " + os.tmpdir())
     const filePath =  path.join(os.tmpdir(),`${fileName}`)
-    await azureStorage.downloadBlob(containerName,blobName,filePath)
-    setTimeout(()=>{
-          deleteFilesFromLocal(filePath)
-    },10000)
+    const readStream = await azureStorage.downloadBlob(containerName,blobName,filePath)
+    // setTimeout(()=>{
+    //       deleteFilesFromLocal(filePath)
+    // },10000)
     //res.attachment(`${report.original_file_name}`);
-    return res.download(filePath)
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    res.setHeader('Content-Disposition', "attachment; fileName=download.docx")
+    return await readStream.readableStreamBody.pipe(res)
 }
 
 async function updateDocument(req,res){

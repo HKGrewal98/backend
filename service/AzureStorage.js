@@ -96,7 +96,7 @@ async function downloadBlob(containerName,blobName,fileName){
    try{
      const containerClient = await getExistingContainer(containerName)
      const blobClient = containerClient.getBlobClient(blobName)
-    await blobClient.downloadToFile(fileName)  
+    return await blobClient.download()  
    }catch(error){
         console.log("Azure Storage || Download error " + error)
         throw error
