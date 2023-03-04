@@ -194,9 +194,7 @@ async function downloadDocumentRelatedToReport(fileId,res){
     //       deleteFilesFromLocal(filePath)
     // },10000)
     //res.attachment(`${report.original_file_name}`);
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-    res.setHeader('Content-Disposition', "attachment; fileName=download.docx")
-    return await readStream.readableStreamBody.pipe(res)
+    return readStream.readableStreamBody.pipe(res)
 }
 
 async function updateDocument(req,res){
