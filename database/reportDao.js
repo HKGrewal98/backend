@@ -8,6 +8,8 @@ const {Op} = require('sequelize')
 const project = require('../models/Project')
 const documentType = require('../models/DocumentType')
 const reportStatus = require('../models/ReportStatus')
+const statusType = require('../service/staticData/StatusType')
+const comments = require('../models/ReviewerComments')
 
 async function saveReport(body,userId,documentPresent){
 
@@ -24,8 +26,8 @@ async function saveReport(body,userId,documentPresent){
         products_covered : body.products_covered,
         models : body.models,
         is_saved: body.is_saved,
-        created_at : date,
-        updated_at : date,
+        created_at : new Date(),
+        updated_at : new Date(),
         status_id  : body.is_saved.toLowerCase() === 'true'?4:1,
         is_active : true,
         receiving_customer : body.receiving_customer,
@@ -57,8 +59,8 @@ async function saveDocument(userId,reportId,type,blobName,originalName,subTypeId
             file_id : (Math.floor(Math.random()*900000) + alphanumeric(3)).toUpperCase(),
             original_file_name:originalName,
             storage_file_name:blobName,
-            created_at : date,
-            updated_at : date,
+            created_at : new Date(),
+            updated_at : new Date(),
             type:type,
             sub_type:subTypeId,
             submitted_by:userId,
@@ -317,6 +319,47 @@ async function getDocumentsCountRelatedToReport(reportId){
     }
 } 
 
+async function recordReviewerDecision(status_id,report_id){
+
+try{
+   let query = `update report set status_id=? , updated_at=? where report_number=?`
+   const result = await sequelize.query(query,{
+    replacements:[+status_id,new Date(),report_id],
+    type:QueryTypes.UPDATE,
+    raw:true
+   })
+       
+   return new Response(200,"SUCCESS",`Report Status updated to ${await statusType.getStatusNameFromId(status_id)} for Id ${report_id}.`,result)
+}catch(error){
+    console.error("Error in recording reviewer decision " + error)
+    return new Response(500,"FAILURE","Unknown error occured.",null) 
+}
+
+}
+
+
+async function addCommentsToTheReport(data,userId){
+
+     try{
+
+        const result = await comments.create({
+            comment:data.comment,
+            recommendations:data.recommendations,
+            created_at:new Date(),
+            reviewer_id:userId,
+            report_id:data.report_id
+        })
+
+     }catch(error){
+        if(error.name === "SequelizeForeignKeyConstraintError"){
+            console.log("Error in saving comment wrong data " + error.name)
+        }
+        console.error("Error in saving comments " + error)
+     }
+}
+
+
 module.exports = {saveReport,saveDocument,getReportsWithStatusCount,getProjectLinkedToReports,
     getAllReportsBasedOnDocumentType,getReportsWithNoDocumentsUploaded,getDocumentBasedOnFileId,
-    getDocumentBasedOnDocId,updateDocument,deleteDocument,getDocumentsCountRelatedToReport}
+    getDocumentBasedOnDocId,updateDocument,deleteDocument,getDocumentsCountRelatedToReport,
+    recordReviewerDecision,addCommentsToTheReport}

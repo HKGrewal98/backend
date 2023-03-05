@@ -17,6 +17,16 @@ class StatusType{
         console.log(statusTypes)
         return statusTypes.map((st) => st.id).filter((id) => id!==this.statusTypeOmitForEngineer)
     }
+
+    static async getStatusNameFromId(id){
+        const statusTypes = await this.getAllStatusTypes()
+        return statusTypes.find((type)=> type.id===+id).name
+    }
+
+    static async validateStatusType(status_id){
+        const statusTypes = await this.getAllStatusTypes()
+        return statusTypes.find((type)=>type.id===status_id)
+    }
 }
 
 module.exports = StatusType

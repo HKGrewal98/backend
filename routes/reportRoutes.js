@@ -6,6 +6,7 @@ const {dirname}  = require('path')
 const path  = require('path')
 const appDir = dirname(require.main.filename)
 const reportStatus = require('../models/ReportStatus')
+const reviewerService = require('../service/reveiwerService')
 
 
 
@@ -44,6 +45,10 @@ reportRoute.put('/upload',editUpload,async(req,res)=>{
 
 reportRoute.put('/delete',async (req,res)=>{
       return await reportService.deleteDocument(req,res)
+})
+
+reportRoute.post('/decision',async (req,res)=>{
+   return await reviewerService.recordDecision(req,res)
 })
 
 

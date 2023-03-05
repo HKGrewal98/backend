@@ -83,6 +83,11 @@ async function getNotifications(req,res){
     return createResponse(result,res)
 }
 
+async function getAllProjectsForAnEngineer(req,res){
+    const response = await projectDao.getAllProjects(req.user.userId)
+    return createResponse(response,res)
+}
+
 
 function createResponse(response,res){
     if(response.getStatusCode() !== 200){
@@ -93,4 +98,4 @@ function createResponse(response,res){
 } 
 
 module.exports = {saveProject,getProjectsByName,getManufactureOrProjectInfo,getAllProjectInformation,
-    getNotifications}
+                 getNotifications,getAllProjectsForAnEngineer}

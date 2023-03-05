@@ -61,15 +61,14 @@ async function main(){
 
 }
 
-const results = [2,3,4,5,6,7,8]
-const id=8
+const results = [{name:"Harkanwal",id:1},{name:"Grewal",id:2}]
 
-const isValid = results.find((doc)=>doc===id)
+const id=1
+
+const isValid = results.find((doc)=>doc.id===id) && true
 console.log("Valid",isValid)
 
-if(!isValid){
-  console.log("Validation failed...")
-}
+
 
 
 
