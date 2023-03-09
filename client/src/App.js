@@ -8,23 +8,22 @@ import { BrowserRouter, Routes, Route, useRoutes } from "react-router-dom";
 import { Login } from "./components/Login/Login";
 import { Footer } from "./components/Common/Footer/Footer";
 import { ComplianceCentralUsers } from "./components/ComplianceCentralUsers/ComplianceCentralUsers";
-import { LandingPage } from "./components/EngineerReviewerView/LandingPage/LandingPage";
-import CreateProjectFolder from "./components/EngineerReviewerView/AssignedProjects/CreateProjectFolder";
+import { LandingPage } from "./components/EngineerView/LandingPage/LandingPage";
+import CreateProjectFolder from "./components/EngineerView/AssignedProjects/CreateProjectFolder";
 import Reviewreports from "./components/ReviewerView/Reviewreports/Reviewreports";
-import { NewReport } from "./components//EngineerReviewerView/AssignedProjects/Reports/NewReport";
+import { NewReport } from "./components//EngineerView/AssignedProjects/Reports/NewReport";
 
-import { AssignedProjectMain } from "./components/EngineerReviewerView/AssignedProjects/AssignedProjectMain";
-import { Deliverables } from "./components/EngineerReviewerView/AssignedProjects/Deliverables/Deliverables";
-import {Details } from "./components/EngineerReviewerView/AssignedProjects/Details/Details";
-import {Financials } from "./components/EngineerReviewerView/AssignedProjects/Financials/Financials";
-import {SupportingDocuments } from "./components/EngineerReviewerView/AssignedProjects/SupportingDocuments/SupportingDocuments";
-import {Correspondence } from "./components/EngineerReviewerView/AssignedProjects/Correspondence/Correspondence";
-import {EquipmentLog } from "./components/EngineerReviewerView/AssignedProjects/EquipmentLog/EquipmentLog";
-import {Sample } from "./components/EngineerReviewerView/AssignedProjects/Sample/Sample";
+import { AssignedProjectMain } from "./components/EngineerView/AssignedProjects/AssignedProjectMain";
+import { Deliverables } from "./components/EngineerView/AssignedProjects/Deliverables/Deliverables";
+import {Details } from "./components/EngineerView/AssignedProjects/Details/Details";
+import {Financials } from "./components/EngineerView/AssignedProjects/Financials/Financials";
+import {SupportingDocuments } from "./components/EngineerView/AssignedProjects/SupportingDocuments/SupportingDocuments";
+import {Correspondence } from "./components/EngineerView/AssignedProjects/Correspondence/Correspondence";
+import {EquipmentLog } from "./components/EngineerView/AssignedProjects/EquipmentLog/EquipmentLog";
+import {Sample } from "./components/EngineerView/AssignedProjects/Sample/Sample";
 import Reviewworks from "./components/ReviewerView/Reviewreports/Reviewworks";
-import ViewReportsScreen from "./components/EngineerReviewerView/AssignedProjects/Reports/ViewReportsScreen";
+import ViewReportsScreen from "./components/EngineerView/ReviewReport/ViewReportsScreen";
 import { useSelector } from "react-redux";
-import EditReportScreen from "./components/EngineerReviewerView/AssignedProjects/Reports/EditReportScreen";
 
 
 
@@ -46,12 +45,12 @@ function App() {
         {/* Engineer routes */}
 
 
-        <Route path="view/landingPage" element={<LandingPage />} />
+        <Route path="engineerView/landingPage" element={<LandingPage />} />
         <Route path="/complianceCentralUsers" element={<ComplianceCentralUsers />} />
-        <Route path="view/createProjectFolder" element={<CreateProjectFolder />} />
+        <Route path="engineerView/createProjectFolder" element={<CreateProjectFolder />} />
 
         {/* Nested Routes */}
-        <Route path="view/assignedProjects" element={<AssignedProjectMain />}>
+        <Route path="engineerView/assignedProjects" element={<AssignedProjectMain />}>
           <Route index element={<Deliverables />} />
         <Route  path="details" element={<Details />}/>
         <Route  path="financials" element={<Financials />}/>
@@ -63,9 +62,8 @@ function App() {
         <Route  path="equipmentLog" element={<EquipmentLog />}/>
         <Route  path="sample" element={<Sample />}/>
         </Route>
-        <Route path="view/assignedProjects/newReport" element={<NewReport />} />
-        <Route path="view/viewReport" element={<ViewReportsScreen />} />
-        <Route path="view/editReport" element={<EditReportScreen />} />
+        <Route path="engineerView/assignedProjects/newReport" element={<NewReport />} />
+        <Route path="engineerView/reviewReport" element={<ViewReportsScreen />} />
 
 
         {/* Reviewer Eroutes */}

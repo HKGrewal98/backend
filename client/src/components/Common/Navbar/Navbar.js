@@ -67,9 +67,7 @@ export const Navbar = () => {
     }
   }).catch(err=>{
     console.log("error in navbar",err.response)
-    cookies.remove('connect.sid')
-    dispatch(LoginDetails({}))
-    navigate('/')
+    
   })
   },[])
 //  useEffect(()=>{console.log("Ulogged check", ULogged)},[ULogged])
@@ -148,7 +146,7 @@ export const Navbar = () => {
                     style={{width:"auto",border:"0"}}
                   >
                     <li>
-                      <Link className="dropdown-item" to="view/createProjectFolder">
+                      <Link className="dropdown-item" to="engineerView/createProjectFolder">
                         Create a Project Folder
                       </Link>
                     </li>
@@ -258,10 +256,14 @@ export const Navbar = () => {
                         </li>
                         <li>
                           <a className="dropdown-item" href="#">
-                            Some other action
+                            Another action
                           </a>
                         </li>
-                    
+                        <li>
+                          <a className="dropdown-item" href="#">
+                            Something else here
+                          </a>
+                        </li>
                       </ul>
                     </div>
                   </>
