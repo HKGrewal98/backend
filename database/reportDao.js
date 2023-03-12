@@ -10,6 +10,7 @@ const documentType = require('../models/DocumentType')
 const reportStatus = require('../models/ReportStatus')
 const statusType = require('../service/staticData/StatusType')
 const comments = require('../models/ReviewerComments')
+const user = require('../models/User')
 
 async function saveReport(body,userId,documentPresent){
 
@@ -358,8 +359,62 @@ async function addCommentsToTheReport(data,userId){
      }
 }
 
+async function getAllInformationByReportId(reportId){
+
+    try{
+         const reportInfo = await report.findByPk(reportId,{
+            raw:true,
+            include:[
+                {model:project , as:'project_number_fk'},
+                {model:user, as:'receiving_customer_fk' , attributes:["name","id"]},
+                {model:user , as:'reviewer_id_fk', attributes:["name","id"]},
+                {model:user , as:'created_by_fk', attributes:["name","id"]}
+            ]
+         })
+
+         const documentInfo = await document.findAll({
+            where:{
+                report_id:{
+                    [Op.eq]:reportId
+                }
+            }
+         })
+
+
+        const result = {
+            report:reportInfo,
+            documents:documentInfo
+        }
+         
+
+         return new Response(200,"SUCCESS",`Information for report with id ${reportId}.`,result)
+
+    }catch(error){
+        console.error("Error in recording reviewer decision " + error)
+        return new Response(500,"FAILURE","Unknown error occured.",null) 
+    }
+
+}
+
+async function updateReport(query){
+
+    try{  
+        const result = await sequelize.query(query,{
+            raw:true,
+            replacements:[new Date()],
+            type:QueryTypes.UPDATE
+        })
+        return new Response(200,"SUCCESS",`Information updated successfully.`,result)
+    }catch(error){
+        if(error.name==='SequelizeForeignKeyConstraintError'){
+            return new Response(400,"FAILURE","User(receiving_customer/reviewer) does not exist in the system.",null) 
+        }
+        console.log("Error in updating the report " + error)
+        return new Response(500,"FAILURE","Unknown error occured.",null) 
+    }
+}
 
 module.exports = {saveReport,saveDocument,getReportsWithStatusCount,getProjectLinkedToReports,
     getAllReportsBasedOnDocumentType,getReportsWithNoDocumentsUploaded,getDocumentBasedOnFileId,
     getDocumentBasedOnDocId,updateDocument,deleteDocument,getDocumentsCountRelatedToReport,
-    recordReviewerDecision,addCommentsToTheReport}
+    recordReviewerDecision,addCommentsToTheReport,getAllInformationByReportId,updateReport}

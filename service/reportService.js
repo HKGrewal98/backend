@@ -17,6 +17,11 @@ const reveiwerService = require('../service/reveiwerService')
 const FileType = require('../service/staticData/FileType')
 const os = require('os')
 
+const updateKeyChecks = {
+    report : ['report_name','receiving_customer','reviewer_id','products_covered','models','comments'],
+    project_info: ['project_name','project_type']
+}
+
 
 function validateRequest(req){
   const {report_name,receiving_customer,reviewer_id,project_number} = req.body
@@ -295,7 +300,7 @@ async function deleteDocument(req,res){
         return res.json((new Response(200,"SUCCESS",`Document deleted with doc_id ${doc_id} linked to report_id ${report_id}.`,deleteResponse)).getSuccessObject())
     }catch(error){
         console.error("Error in deleting existing document " + error)
-        return res.json(( new Response(500,"FAILURE",`Unknown error occured.`,"")).getErrorObject())
+        return res.json(( new Response(500,"FAILURE",`Unknown error occured.`,null)).getErrorObject())
     }
 
 }
@@ -310,6 +315,65 @@ async function deleteFilesFromLocal(path){
       })
 }
 
+async function getAllInformationByReportId(reportId,res){
+    const response = await reportDao.getAllInformationByReportId(reportId)
+    return createResponse(response,res)
+}
+
+async function updateReportInfo(body,res){
+  
+   try{
+    if(!updateKeyChecks.hasOwnProperty(body.metaInfo)){
+        console.error("Wrong MetaInfo")
+        return res.status(400).json((new Response(400,"FAILURE","MetaInfo value is invalid.",null)).getErrorObject())
+    }
+
+    console.log(body)
+
+    const result = Object.keys(body.data).every((key) => updateKeyChecks[body.metaInfo].includes(key))
+ 
+    if(!result){
+    console.info("Invalid keys.")
+    return res.status(400).json((new Response(400,"FAILURE","Data fields are invalid.Update Process existed.",null)).getErrorObject())
+    }
+  
+    let length = Object.keys(body.data).length
+    if(length===0){
+    console.info("Length 0")
+    return res.status(400).json((new Response(400,"FAILURE","No fields available in the request to be processed.",null)).getErrorObject())
+    }
+    
+    let iter=1
+    let query = body.metaInfo==='report' ? `update report set`:
+    `update project_info p inner join report r on p.project_number=r.project_number set`
+    
+
+    for(let rel in body.data){
+    if(!body.data[rel] || body.data[rel].length === 0 || body.data[rel] === 'undefined'){
+        return res.status(400).json((new Response(400,"FAILURE","Values are empty/undefined for the fields to be updated.",null)).getErrorObject())
+    }
+    let col = body.metaInfo==='report' ?  `${rel} = '${body.data[rel]}'`: `p.${rel} = '${body.data[rel]}'`
+    
+    query = iter===1 ? query.concat(' ').concat(col) : query.concat(',').concat(' ').concat(col)
+    iter++;
+    }
+
+    let condition = body.metaInfo==='report' ?  `, updated_at=? where report_number='${body.where}'`
+                   : `, p.updated_at=? where r.report_number='${body.where}'`
+    
+
+    query = query.concat(' ').concat(condition)
+    console.info(query)
+    const response  = await reportDao.updateReport(query)
+    return createResponse(response,res)
+   }catch(error){
+       console.error("Error updating the report " + error)
+       return res.json(( new Response(500,"FAILURE",`Unknown error occured.`,"")).getErrorObject()) 
+   }
+
+}
+
+
 function createResponse(response,res){
     if(response.getStatusCode() !== 200){
         return res.status(response.getStatusCode()).json(response.getErrorObject())
@@ -319,7 +383,7 @@ function createResponse(response,res){
 } 
 
 module.exports = {saveReport,getReportsWithStatusCount,deleteFilesFromLocal,downloadDocumentRelatedToReport,
-                 updateDocument,deleteDocument}
+                 updateDocument,deleteDocument,getAllInformationByReportId,updateReportInfo}
 
 
 

@@ -4,6 +4,7 @@ const Response = require('../service/customResponse')
 const {Op} = require('sequelize') 
 const { QueryTypes } = require('sequelize');
 const sequelize = require('../database/DBConnection')
+const statusType = require('../service/staticData/StatusType')
 
 async function getReveiwerProjectsByName(userId,name,req){
 
@@ -75,14 +76,29 @@ async function searchForReveiwer(req){
 async function getReviwerNotifications(userId,req){
 
     const {limit,offset} = getLimitAndOffset(req)
+    const {screenId=4,fetchAll} = req.query
+    console.log("ScreenId " + screenId + " and fetchAll flag is : " + fetchAll) 
+     
+    let statusIds = []
+    if(fetchAll && fetchAll.toLowerCase()==='true'){
+        statusIds = await statusType.getAllStatusIds()
+    } else {
+        statusIds.push(screenId)
+    }
+    
     try{
-     let query = `select r.report_number, r.created_by as 'report_created_by' , r.report_name , u.name as 'engineer_name', st.name as
-     "report_status" , r.created_at as 'report_created_at' from report r inner join user u on r.created_by = u.id
-     inner join status_type st on r.status_id=st.id where r.reviewer_id=? and r.status_id in (?)  
-     order by r.updated_at desc limit ? offset ?`
+     let query = ` select r.report_number , r.report_name ,  r.tags ,
+     p.project_number , p.project_name , p.receiving_customer ,u.name as 'receiving_customer_name',
+     r.created_by , eu.name as 'engineer_name' , 
+     r.reviewer_id , ur.name as 'reviewer_name', r.status_id , st.name as 'status_type' from report r 
+    inner join project_info p on r.project_number = p.project_number inner join status_type st on r.status_id = st.id
+    inner join user u on u.id = p.receiving_customer
+    inner join user eu on eu.id = r.created_by
+    inner join user ur on ur.id = r.reviewer_id
+    where r.reviewer_id=? and status_id in (?) and r.is_saved=true limit ? offset ?`
 
      const result = await sequelize.query(query,{
-        replacements:[userId,[4],limit,offset],
+        replacements:[userId,statusIds,limit,offset],
         raw:true,
         type:QueryTypes.SELECT
      })

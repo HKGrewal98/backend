@@ -12,6 +12,13 @@ class StatusType{
        return this.reportStatusType
     }
 
+    static async getAllStatusIds(){
+        const statusTypes = await this.getAllStatusTypes()
+        const statusIds = statusTypes.map((type) => type.id)
+        console.log(statusIds)
+        return statusIds
+    }
+
     static async getEngineerNotificationStatusTypes(){
         const statusTypes = await this.getAllStatusTypes()
         console.log(statusTypes)

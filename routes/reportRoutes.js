@@ -51,6 +51,15 @@ reportRoute.post('/decision',async (req,res)=>{
    return await reviewerService.recordDecision(req,res)
 })
 
+reportRoute.post('/update',async (req,res) => {
+      return await reportService.updateReportInfo(req.body,res)
+})
+
+reportRoute.get('/:id',async (req,res)=>{
+      const {id} = req.params
+      return await reportService.getAllInformationByReportId(id,res)
+})
+
 
 module.exports = reportRoute
 

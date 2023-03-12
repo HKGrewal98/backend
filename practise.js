@@ -61,14 +61,86 @@ async function main(){
 
 }
 
-const results = [{name:"Harkanwal",id:1},{name:"Grewal",id:2}]
-
-const id=1
-
-const isValid = results.find((doc)=>doc.id===id) && true
-console.log("Valid",isValid)
 
 
+const metaInfo = ['report','project_info']
+const validColums = ['report_name','receiving_customer','reviewer_id','products_covered','models','comments','project_name','project_type']
+const reportId = '4BC8047866MS8'
 
+const body = {
+
+  metaInfo:'report',
+  data:{
+    report_name:'report-MS1998',
+    products_covered:'IFCAI',
+    models:'Mid version 2.3',
+    comments:'More Detailing required'
+  },
+  where:reportId
+}
+
+function updateReport(body){
+      
+  if(!metaInfo.includes(body.metaInfo)){
+         console.info("Wrong MetaInfo")
+         return
+  }
+
+  const validKeys = (key) => validColums.includes(key)
+  const result = Object.keys(body.data).every(validKeys)
+
+  if(!result){
+    console.info("Invalid keys.")
+    return
+  }
+
+  let length = Object.keys(body.data).length
+  if(length===0){
+    console.info("Length 0")
+    return
+  }
+  let query
+  let iter=1
+
+  if(body.metaInfo==='report'){
+       query = `update report set`
+  }else{
+      query = `update project_info p inner join report r on p.project_number=r.project_number set`
+  }
+
+  for(let rel in body.data){
+  
+    const col = `${rel} = '${body.data[rel]}'`
+    if(iter===1){
+      query=query.concat(' ').concat(col)
+    }else{
+      query=query.concat(',').concat(' ').concat(col)
+    }
+    iter++;
+  }
+
+  let condition
+  if(body.metaInfo==='report'){
+    condition = `where report_number='${body.where}'`
+}else{
+  condition = `where r.report_number='${body.where}'`
+}
+
+  query = query.concat(' ').concat(condition)
+  console.info(query)
+}
+
+//updateReport(body)
+
+
+const updateKeyChecks = {
+  report : ['report_name','receiving_customer','reviewer_id','products_covered','models','comments'],
+  project_info: ['project_name','project_type']
+}
+let meta = 'report'
+const validKeys = (key) => Object.keys(updateKeyChecks)
+const list = ['receiving_customer']
+const ans = list.every((key) => updateKeyChecks[meta].includes(key))
+console.info("ANs : " + ans)
 
 
