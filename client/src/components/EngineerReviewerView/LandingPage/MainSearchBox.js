@@ -10,6 +10,7 @@ import Cookies from 'universal-cookie'
 import { useDispatch } from "react-redux";
 import { LoginDetails } from "../../Login/LoginReducer/LoginSlice";
 import {ProjectNumber} from "../AssignedProjects/AssignedProjectsReducer/ProjectNumber";
+import BACKEND_URL from "../../../backendUrl";
 
 export const MainSearchBox = () => {
   const [show, setShow] = useState(false);
@@ -45,7 +46,7 @@ export const MainSearchBox = () => {
     axios({
       method: 'get',
       maxBodyLength: Infinity,
-        url: '/project/search',
+        url: `${BACKEND_URL}/project/search`,
         params : data,
         headers:myHeaders,
         credentials: "include", 
@@ -78,6 +79,7 @@ export const MainSearchBox = () => {
  const showProject=(data)=>{
   console.log("Project number check main search box" , data)
   dispatch(ProjectNumber(data))
+  localStorage.setItem("SelectedProject", JSON.stringify(data))
   navigate('/view/assignedProjects')
  }
   return (

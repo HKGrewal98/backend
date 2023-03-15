@@ -5,6 +5,7 @@ import AllProjectsDetails from '../components/EngineerReviewerView/AssignedProje
 import LoaderSliceReducer from '../components/Common/LoaderReducer/LoaderSlice'
 import ProjectNumber from '../components/EngineerReviewerView/AssignedProjects/AssignedProjectsReducer/ProjectNumber'
 import ReportDetails from '../components/EngineerReviewerView/AssignedProjects/AssignedProjectsReducer/ReportDetails'
+import ReviewerAllReportsSlice from '../components/EngineerReviewerView/ReviewerMain/ReviewerReducers/ReviewerAllReportsSlice'
 
 
 export const store = configureStore({
@@ -15,6 +16,7 @@ export const store = configureStore({
     AllProjectsDetails: AllProjectsDetails,
     ProjectNumberDetails: ProjectNumber,
     ReportDetails : ReportDetails,
+    ReviewerData : ReviewerAllReportsSlice,
     LoaderSlice: LoaderSliceReducer,
   
   },

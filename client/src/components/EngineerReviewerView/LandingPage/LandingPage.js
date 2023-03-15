@@ -18,6 +18,7 @@ import Modal from 'react-bootstrap/Modal';
 
 
 import Cookies from "universal-cookie";
+import BACKEND_URL from "../../../backendUrl";
 
 export const LandingPage = () => {
   const ULogged = useSelector((state)=>state.Login.value)
@@ -26,8 +27,10 @@ export const LandingPage = () => {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [searchResult, setSearchResult] = useState()
-  const showProject=(project_name)=>{
-    localStorage.setItem("ProjectName",JSON.stringify(project_name))
+  const showProject=(data)=>{
+  //   localStorage.setItem("ProjectName",JSON.stringify(data?.project_name))
+  localStorage.setItem("SelectedProject", JSON.stringify(data))
+
     navigate('/view/assignedProjects')
    }
   const {
@@ -51,7 +54,7 @@ export const LandingPage = () => {
     axios({
       method: 'get',
       maxBodyLength: Infinity,
-        url: '/project/search',
+        url: `${BACKEND_URL}/project/search`,
         params : data,
         headers:myHeaders,
         credentials: "include", 
@@ -112,7 +115,6 @@ export const LandingPage = () => {
   return (
     <>
    
-    {ULogged?.is_engineer===true ?
    
     <>
      {show?<>
@@ -129,7 +131,7 @@ export const LandingPage = () => {
             return(
             <div key={index}>
             <div className="d-flex resultCs" onClick={()=>{
-              showProject(data?.project_name)
+              showProject(data)
             }}>
             <p className="mr-3"><b>Project Name</b> : {data?.project_name}</p>
             <p><b>Project Number</b> : {data?.project_number}</p>
@@ -239,8 +241,8 @@ export const LandingPage = () => {
        <ReviewNotificationsBox />
      </div>
    </div>
-    </>:<>Logged out</>
-  }
+    </>
+  
       
      
     </>

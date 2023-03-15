@@ -1,4 +1,4 @@
-.pendingbox{
+.containerbox{
     border-color:rgb(250, 253, 253);
 border-style:groove;
     display: flex;
@@ -16,9 +16,7 @@ padding-right: 5px;
 }
 
 
-.pendingbox>section{
-    font-size: x-small;
-}
+
 
 
 .table{

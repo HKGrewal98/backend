@@ -5,13 +5,15 @@ import { useNavigate } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {ProjectNumber} from "../AssignedProjects/AssignedProjectsReducer/ProjectNumber";
+import BACKEND_URL from "../../../backendUrl";
 
 export const AssignedProjectsBox = () => {
   const [show, setShow] = useState(false);
   const [searchResult, setSearchResult] = useState()
   const handleClose = () => setShow(false);
+  const ULogged = useSelector((state)=>state.Login.value)
   const dispatch = useDispatch()
   const handleShow = () => setShow(true);
   let navigate = useNavigate()
@@ -29,7 +31,7 @@ export const AssignedProjectsBox = () => {
     axios({
      method:'get',
      maxBodyLength: Infinity,
-     url: `/project`,
+     url: `${BACKEND_URL}/project`,
      credentials: "include", 
      withCredentials:true,
      params:{
@@ -50,6 +52,7 @@ export const AssignedProjectsBox = () => {
   };
   const showProject=(data)=>{
     dispatch(ProjectNumber(data))
+  localStorage.setItem("SelectedProject", JSON.stringify(data))
     navigate('/view/assignedProjects')
    }
   return (
@@ -95,7 +98,12 @@ export const AssignedProjectsBox = () => {
             Assigned Projects
           </div>
           <div>
-          <div className="btn text-primary pt-0" onClick={()=>navigate('/view/assignedProjects')}>View All</div>
+            {ULogged?.is_engineer === true ? <>
+              <div className="btn text-primary pt-0" onClick={()=>navigate('/view/assignedProjects')}>View All</div>
+            </>:<>
+            <div className="btn text-primary pt-0">View All</div>
+            </>}
+          
           </div>
         </div>
         <div className="customBody">

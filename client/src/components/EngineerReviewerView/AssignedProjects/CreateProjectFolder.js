@@ -5,12 +5,15 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import "./AssignedProjects.css"
 import { NavLink, useNavigate } from 'react-router-dom';
 import debounce from 'debounce'
+import BACKEND_URL from '../../../backendUrl';
+import { ProjectNumber } from './AssignedProjectsReducer/ProjectNumber';
 
 const CreateProjectFolder = () => {
   const { register, handleSubmit,getValues , trigger, formState: { errors }} = useForm();
   const [showModalGreen, setShowModalGreen] = useState(false)
   const [showModalRed, setShowModalRed] = useState(false)
   const [modalRedMessage, setModalRedMessage] = useState()
+  const [ProjectCreatedData, setProjectCreatedData] = useState()
   const navigate = useNavigate()
   const[searchResults, setSearchResults] = useState([])
   const[searchResults1, setSearchResults1] = useState([])
@@ -29,7 +32,7 @@ const CreateProjectFolder = () => {
     axios({
       method: 'post',
       maxBodyLength: Infinity,
-        url: '/project/save',
+        url: `${BACKEND_URL}/project/save`,
         headers:myHeaders,
         data : data,
         credentials: "include", 
@@ -39,6 +42,7 @@ const CreateProjectFolder = () => {
       console.log(JSON.stringify(response.data));
       if(response.data.statusCode===200){
         setShowModalGreen(true)
+        setProjectCreatedData({"project_number":response.data?.data?.id,"project_name":data.project_name})
        
       }
       else if (response.data.isLoggedIn==="false"){
@@ -84,6 +88,8 @@ const CreateProjectFolder = () => {
   </div>
   <div class="custom-modal-footer d-flex justify-content-end ">
     <button className='btn m-2' style={{backgroundColor:"#60CD8A", color:"white"}} onClick={()=>{
+      localStorage.setItem("SelectedProject", JSON.stringify(ProjectCreatedData)) 
+      dispatch(ProjectNumber(ProjectCreatedData))
        navigate('/view/assignedProjects')
       setShowModalGreen(false)}}>Proceed to your project</button>
   </div>
@@ -180,7 +186,7 @@ const CreateProjectFolder = () => {
               axios({
                 method: 'get',
                 maxBodyLength: Infinity,
-                  url: '/user/merchant',
+                  url: `${BACKEND_URL}/user/merchant`,
                   params : data,
                 
                   credentials: "include", 
@@ -241,7 +247,7 @@ const CreateProjectFolder = () => {
               axios({
                 method: 'get',
                 maxBodyLength: Infinity,
-                  url: '/user/search',
+                  url: `${BACKEND_URL}/user/search`,
                   params : data,
                 
                   credentials: "include", 

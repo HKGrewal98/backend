@@ -3,6 +3,7 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import BACKEND_URL from "../../../backendUrl";
 import { LoaderStatus } from "../../Common/LoaderReducer/LoaderSlice";
 
 export const MyReviewsBox = () => {
@@ -17,7 +18,7 @@ export const MyReviewsBox = () => {
     axios({
      method:'get',
      maxBodyLength: Infinity,
-     url: '/report',
+     url: `${BACKEND_URL}/report`,
      credentials: "include", 
      withCredentials:true,
      headers:myHeaders

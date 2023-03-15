@@ -2,11 +2,11 @@ import axios from 'axios';
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LoginDetails } from '../../../Login/LoginReducer/LoginSlice';
+import { LoginDetails } from '../../Login/LoginReducer/LoginSlice';
 import "./ViewReportScreen.css"
 import Cookies from "universal-cookie";
 
-const EditReportScreen = () => {
+const ViewReportsScreen = () => {
   const ReportsDetailsRedux = useSelector((state) => state.ReportDetails.value);
   const dispatch = useDispatch()
   const cookies = new Cookies()
@@ -38,7 +38,7 @@ const EditReportScreen = () => {
 
 
 
-<div className='colorbox'>
+{/* <div className='colorbox'>
 
 <p><svg width="50" height="25" viewBox="1 0 48 25" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="45" height="24" rx="12" fill="#00A900"/>
@@ -79,7 +79,7 @@ const EditReportScreen = () => {
 
 </p>
 
-</div>
+</div> */}
 
 
 {ReportsDetailsRedux?.report && ReportsDetailsRedux?.project ? <>
@@ -93,19 +93,19 @@ const EditReportScreen = () => {
 
 <div className='ProjectNumber'>
 <section>Project Number</section>
-<input type="text"   placeholder={ReportsDetailsRedux?.project?.project_number}></input></div>
+<input type="text"  disabled placeholder={ReportsDetailsRedux?.project?.project_number}></input></div>
 
 <div className='ReviewType'>
     <section>Review Type</section>
-   <input type="text"  ></input></div>
+   <input type="text"  disabled></input></div>
 
     <div className='ReportType'>
         <section>Report Type</section>
-        <input type="text"  placeholder={ReportsDetailsRedux?.report?.file_sub_type}></input></div>
+        <input type="text" disabled placeholder={ReportsDetailsRedux?.report?.file_sub_type}></input></div>
 
         <div className='RecievingContact'>
         <section>Recieving Contact</section>
-        <input type="text"  placeholder={ReportsDetailsRedux?.project?.receiving_customer}></input></div>
+        <input type="text" disabled placeholder={ReportsDetailsRedux?.project?.receiving_customer}></input></div>
 
         <div className='ResponsiblePerson'>
         <section>Responsible Person /Date Created</section>
@@ -113,37 +113,37 @@ const EditReportScreen = () => {
 
         <div className='ReviewerDate'>
         <section>Reviewer /Review Date</section>
-        <input type="text" ></input></div>
+        <input type="text" disabled></input></div>
 
 </div>
 <div className='reportsreceivingcontainer'>
 
         <div className='ReportRecieving'>
         <section>Report Recieving Customer</section>
-        <input type="text"  placeholder={ReportsDetailsRedux?.report?.receiving_customer}></input></div>
+        <input type="text" disabled placeholder={ReportsDetailsRedux?.report?.receiving_customer}></input></div>
 
 
         <div className='ReportReview'>
         <section>Report Review Status:</section>
-        <input type="text"  placeholder={ReportsDetailsRedux?.report?.report_status}></input></div>
+        <input type="text" disabled placeholder={ReportsDetailsRedux?.report?.report_status}></input></div>
 
 
 
         <div className='ProductsCovered'>
         <section>Products Covered</section>
-        <input type="text"  placeholder={ReportsDetailsRedux?.project?.product_covered}></input></div>
+        <input type="text" disabled placeholder={ReportsDetailsRedux?.project?.product_covered}></input></div>
 
         <div className='Models'>
         <section>Models</section>
-        <input type="text"  placeholder={ReportsDetailsRedux?.project?.modals}></input></div>
+        <input type="text" disabled placeholder={ReportsDetailsRedux?.project?.modals}></input></div>
 
         <div className='Project'>
         <section>Project</section>
-        <input type="text"  placeholder={ReportsDetailsRedux?.project?.project_name}></input></div>
+        <input type="text" disabled placeholder={ReportsDetailsRedux?.project?.project_name}></input></div>
 
         <div className='Comments'>
         <section>Comments:</section>
-        <input type="text"  placeholder={ReportsDetailsRedux?.report?.report_comments}></input></div>
+        <input type="text" disabled placeholder={ReportsDetailsRedux?.report?.report_comments}></input></div>
 
 
         </div>
@@ -155,7 +155,7 @@ const EditReportScreen = () => {
         </div>
         <div className='DocumentsParents'>
     <h4><b>DOCUMENTS</b></h4>
-    <button type="button" className="btn btn-dark">ADD REVIEW DOCUMENTS</button>
+    {/* <button type="button" className="btn btn-dark">ADD REVIEW DOCUMENTS</button> */}
 </div>
 <table className="table">
   <thead>
@@ -199,7 +199,7 @@ const EditReportScreen = () => {
    
     
 
-<svg className='m-2' width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"
+{/* <svg className='m-2' width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"
  style={{ cursor: "pointer" }}
  onClick={() => {
    var myHeaders = new Headers();
@@ -243,12 +243,12 @@ const EditReportScreen = () => {
 <path d="M6.66699 4.99984V3.33317C6.66699 2.49984 7.50033 1.6665 8.33366 1.6665H11.667C12.5003 1.6665 13.3337 2.49984 13.3337 3.33317V4.99984" stroke="#007D99" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
 <path d="M8.33301 9.1665V14.1665" stroke="#007D99" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
 <path d="M11.667 9.1665V14.1665" stroke="#007D99" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-</svg>
+</svg> */}
 
-<svg className='m-2' width="20" height="17" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg" style={{cursor:"pointer"}}
+<svg className='m-2 mt-3' width="20" height="17" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg" style={{cursor:"pointer"}}
 onClick={() => {
   window.open(
-    `/report/download/${ReportsDetailsRedux?.report?.file_id}`
+    `http://localhost:8081/report/download/${ReportsDetailsRedux?.report?.file_id}`
   );
 }}
 >
@@ -282,4 +282,4 @@ onClick={() => {
   )
 }
 
-export default EditReportScreen
+export default ViewReportsScreen

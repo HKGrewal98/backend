@@ -11,11 +11,19 @@ import { LoginDetails } from "../../../Login/LoginReducer/LoginSlice";
 import Cookies from 'universal-cookie'
 import { useState } from "react";
 import { Reports } from "../AssignedProjectsReducer/ReportDetails";
+import { ProjectNumber } from "../AssignedProjectsReducer/ProjectNumber";
+import BACKEND_URL from "../../../../backendUrl";
 export const EquipmentLog = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const EquipmentLogData = useSelector((state) => state.Deliverables.value);
   const ProjectNumberRedux = useSelector((state) => state.ProjectNumberDetails.value.project_number);
+  var myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("Access-Control-Allow-Origin", "http://localhost:8081");
+  myHeaders.append("Access-Control-Allow-Credentials", true);
+  const [showModalDeleteDoc, setShowModalDeleteDoc] = useState(false)
+  const [tempReport, setTempReport] = useState()
 
   const cookies = new Cookies()
   const [arrayPageState, setArrayPageState] = useState(1)
@@ -36,10 +44,7 @@ export const EquipmentLog = () => {
     }
   }
 
-  var myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
-  myHeaders.append("Access-Control-Allow-Origin", "http://localhost:8081");
-  myHeaders.append("Access-Control-Allow-Credentials", true);
+  
 
   const getEquipmentlog = ()=>{
     if(ProjectNumberRedux !== undefined){
@@ -51,7 +56,7 @@ export const EquipmentLog = () => {
     axios({
       method: "get",
       maxBodyLength: Infinity,
-      url: `/project/${ProjectNumberRedux}`,
+      url: `${BACKEND_URL}/project/${ProjectNumberRedux}`,
       headers: myHeaders,
       credentials: "include",
       withCredentials: true,
@@ -77,6 +82,7 @@ export const EquipmentLog = () => {
         if(error?.response?.status===401){
           dispatch(LoginDetails({}));
               cookies.remove('connect.sid');
+              
               localStorage.setItem("AlertMessage", JSON.stringify("Session Expired...Please Login Again"))
             navigate('/')
         }
@@ -85,18 +91,79 @@ export const EquipmentLog = () => {
   }
   useEffect(()=>{
     let prevProjectNumber = JSON.parse(localStorage.getItem("PrevProjectNumber"))
+    
     if(prevProjectNumber != ProjectNumberRedux ||  !EquipmentLogData?.project){
     getEquipmentlog()
     }
   },[ProjectNumberRedux])
   useEffect(() => {
+    let SelectedProject = JSON.parse(localStorage.getItem("SelectedProject"))
+
     if(!EquipmentLogData?.project){
       getEquipmentlog()
+    }
+    if(!EquipmentLogData?.project?.project_name && SelectedProject != undefined){
+      dispatch(ProjectNumber(SelectedProject))
+      getEquipmentlog() 
+
     }
   }, []);
 
   return (
     <div>
+       {showModalDeleteDoc === true ? <>
+      <div id="myCustomModal" class="customModal">
+<div class="custom-modal-content" >
+  <div class="custom-modal-header customDC-color pt-2" >
+   
+    <h4 className='text-center '>Are you sure you want to delete the document?</h4>
+  </div>
+ 
+ 
+  <div class="custom-modal-footer d-flex justify-content-end ">
+  <button className="btn customDC-color m-2"  onClick={()=>{
+         axios({
+          method: 'put',
+          maxBodyLength: Infinity,
+          url: `${BACKEND_URL}/report/delete`,
+          headers:myHeaders,
+          credentials: "include", 
+          withCredentials:true,
+            data : {
+              doc_id:tempReport?.doc_id,
+              report_id: tempReport?.report_id
+            },
+          
+        })
+        .then(function (response) {
+          console.log("Response From Delete in equipment log",response.data)  
+          if(response?.data?.statusCode === 200){
+          setShowModalDeleteDoc(false)
+          getEquipmentlog() 
+          }
+        
+        })
+        .catch(function (error) {
+          console.log("Error block delete teport", error);
+          if(error?.response?.status===401){
+            dispatch(LoginDetails({}));
+                cookies.remove('connect.sid');
+                localStorage.setItem("AlertMessage", JSON.stringify("Session Expired...Please Login Again"))
+              navigate('/')
+          }
+          
+         
+        });
+  }}>
+            Confirm
+          </button>
+    <button className='btn customDC-color m-2' onClick={()=>{
+       
+      setShowModalDeleteDoc(false)}}>Cancel</button>
+  </div>
+</div>
+</div>
+    </>:""}
       <div className="Adddocument">
         <button>ADD DOCUMENT</button>
       </div>
@@ -104,15 +171,15 @@ export const EquipmentLog = () => {
       <table className="table customTableMArgin" >
         <thead>
           <tr>
-            <th scope="col" style={{width:"125px"}}>Date created</th>
-            <th scope="col" style={{width:"125px"}}>Record Name</th>
-            <th scope="col" style={{width:"125px"}}>Record Type</th>
-            <th scope="col" style={{width:"125px"}}>Project Number</th>
-            <th scope="col" style={{width:"125px"}}>Project Name</th>
-            <th scope="col" style={{width:"125px"}}>Description</th>
-            <th scope="col" style={{width:"125px"}}>Responsibility</th>
-            <th scope="col" style={{width:"125px"}}>Work Order</th>
-            <th scope="col"></th>
+            <th scope="col" style={{minWidth:"110px"}}>Date created</th>
+            <th scope="col" style={{minWidth:"110px"}}>Record Name</th>
+            <th scope="col" style={{minWidth:"110px"}}>Record Type</th>
+            <th scope="col" style={{minWidth:"110px"}}>Project Number</th>
+            <th scope="col" style={{minWidth:"110px"}}>Project Name</th>
+            <th scope="col" style={{minWidth:"110px"}}>Description</th>
+            <th scope="col" style={{minWidth:"110px"}}>Responsibility</th>
+            <th scope="col" style={{minWidth:"110px"}}>Work Order</th>
+            <th scope="col" width="140px"></th>
           </tr>
         </thead>
 
@@ -142,7 +209,7 @@ export const EquipmentLog = () => {
                        style={{cursor:"pointer"}} 
                        onClick={()=>{
                         window.open(
-                          `/report/download/${data?.file_id}`
+                          `http://localhost:8081/report/download/${data?.file_id}`
                         )
                     }}
                        >
@@ -214,40 +281,11 @@ export const EquipmentLog = () => {
                         xmlns="http://www.w3.org/2000/svg"
                         style={{ cursor: "pointer" }}
                         onClick={() => {
-                          var myHeaders = new Headers();
-                          myHeaders.append("Content-Type", "application/json");
-                          myHeaders.append("Access-Control-Allow-Origin", "http://localhost:8081");
-                          myHeaders.append("Access-Control-Allow-Credentials", true);
+                          setShowModalDeleteDoc(true)
+                         setTempReport({"doc_id":data?.file_id,
+                          "report_id": data?.report_number, "original_file_name": data?.original_file_name})
                         
-                          axios({
-                            method: 'put',
-                            maxBodyLength: Infinity,
-                            url: '/report/delete',
-                            headers:myHeaders,
-                            credentials: "include", 
-                            withCredentials:true,
-                              data : {
-                                doc_id:data?.file_id,
-                                report_id: data?.report_number
-                              },
-                            
-                          })
-                          .then(function (response) {
-                            // console.log("Response From Delete in equipment Log",response.data)  
-                            getEquipmentlog()
-                          
-                          })
-                          .catch(function (error) {
-                            console.log("Error block delete teport", error);
-                            if(error?.response?.status===401){
-                              dispatch(LoginDetails({}));
-                                  cookies.remove('connect.sid');
-                                  localStorage.setItem("AlertMessage", JSON.stringify("Session Expired...Please Login Again"))
-                                navigate('/')
-                            }
-                            
-                           
-                          });
+                         
                         }}
                       >
                         <path

@@ -11,6 +11,7 @@ import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import Cookies from "universal-cookie";
 import { LoaderStatus } from "../Common/LoaderReducer/LoaderSlice";
+import BACKEND_URL from "../../backendUrl";
 
 
 // import {REACT_APP_URL_BACKEND} from process.env;
@@ -44,7 +45,7 @@ export const Login = () => {
   
         method: 'post',
         
-        url: `/user/login`,
+        url: `${BACKEND_URL}/user/login`,
         
         data:data, 
         credentials: "include", 

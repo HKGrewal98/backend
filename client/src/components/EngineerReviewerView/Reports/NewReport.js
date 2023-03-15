@@ -8,11 +8,12 @@ import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { LoaderStatus } from '../../../Common/LoaderReducer/LoaderSlice';
+import { LoaderStatus } from '../../Common/LoaderReducer/LoaderSlice';
 import { useEffect } from 'react';
-import { LoginDetails } from '../../../Login/LoginReducer/LoginSlice';
+import { LoginDetails } from '../../Login/LoginReducer/LoginSlice';
 import Cookies from "universal-cookie"
 import debounce from 'debounce'
+import BACKEND_URL from '../../../backendUrl';
 
 
 export const NewReport=()=>{
@@ -50,13 +51,12 @@ export const NewReport=()=>{
     
     if(count>0)
     {
-      alert("Standards Submitted successfully!")
+      // alert("Standards Submitted successfully!")
     }
     else{
-      alert("please select standards!")
+      // alert("please select standards!")
     }
   }
-
   function countHandler(e){
     console.log(count)
     if(e.target.checked){
@@ -74,6 +74,8 @@ export const NewReport=()=>{
       }
     }
   }
+  const [standards , setStandards] = useState([])
+
   const { register, handleSubmit, control , formState: { errors }} = useForm();
   const[searchResults, setSearchResults] = useState([])
   const[searchResults1, setSearchResults1] = useState([])
@@ -96,8 +98,8 @@ export const NewReport=()=>{
   ];
   
   const onSubmit = ((data) => {
+    
     let formData = new FormData()
-    dispatch(LoaderStatus(true))
     formData.append('issued_at', data.issued_at);
     formData.append('tags', data.tags);
     formData.append('comments', data.comments);
@@ -114,18 +116,24 @@ export const NewReport=()=>{
     formData.append('hasReport', 'true');
     formData.append("certificate",data.certificate[0])
     formData.append('hasCertificate', 'true');
+    formData.append('standard1', data.standard1);
+    formData.append('standard2', data.standard2);
+    formData.append('standard3', data.standard3);
+    formData.append('standard4', data.standard4);
+    
     console.log("form data",data, formData)
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append('Access-Control-Allow-Origin', 'http://localhost:8081')
     myHeaders.append('Access-Control-Allow-Credentials', true)
     
+    dispatch(LoaderStatus(true))
     
     axios({
 
       method: 'post',
       maxBodyLength: Infinity,
-      url: '/report',
+      url: `${BACKEND_URL}/report`,
       
       headers:myHeaders,
         data : formData,
@@ -163,7 +171,7 @@ return(
   <>
   <div className='d-flex justify-content-center' style={{position:"sticky", top:"0"}}>
    {showGreen?<>
-      <Alert className="col-12 col-md-8 col-lg-6 p-1 d-flex align-items-center justify-content-between" show={showGreen} variant="success" >
+      <Alert className="col-12 col-md-8 col-lg-6 p-1 d-flex align-items-center justify-content-between" show={showGreen} variant="success" style={{zIndex:"9"}} >
         <p style={{marginBottom:"0"}}>{alertValue}</p>
         <Button style={{fontSize:"80%"}} onClick={() => 
           navigate('/view/assignedProjects')
@@ -172,7 +180,7 @@ return(
             </Button>
       </Alert>
     </>:<>
-    <Alert className="col-12 col-md-8 col-lg-6 p-1 d-flex align-items-center justify-content-between mx-2" show={showRed} variant="danger" >
+    <Alert className="col-12 col-md-8 col-lg-6 p-1 d-flex align-items-center justify-content-between mx-2" show={showRed} variant="danger" style={{zIndex:"9"}} >
         <p style={{marginBottom:"0"}}>{alertValue}</p>
         <Button style={{fontSize:"80%"}} onClick={() => setShowRed(false)} variant="outline-danger">
             Close
@@ -194,7 +202,7 @@ return(
 
 <div className="mb-3 customColor">
   <label htmlFor="reportNumber" className="form-label"> *Report Name</label>
-  <input type="reportNumber" className="form-control custom_txtbox" id="reportNumber" {...register("name",{ required: true})}/>
+  <input type="reportNumber" className="form-control custom_txtbox" id="reportNumber" {...register("report_name",{ required: true})}/>
   {errors.name && <span style={{color:"red"}}>This field is required</span>}
 </div>
 <div className="mb-3 customColor">
@@ -220,7 +228,7 @@ return(
     axios({
       method: 'get',
       maxBodyLength: Infinity,
-        url: '/user/search',
+        url: `${BACKEND_URL}/user/search`,
         params : data,
       
         credentials: "include", 
@@ -271,31 +279,31 @@ return(
     <label className="custom_label1">*Click(+) to add some Standards</label>
 </div>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-    <div class="modal-header custom_title">
-        <h6 class="modal-title fs-5 custom_title" id="exampleModalLabel">Assign Standards to Review</h6>
+<div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div className="modal-dialog">
+    <div className="modal-content">
+    <div className="modal-header custom_title">
+        <h6 className="modal-title fs-5 custom_title" id="exampleModalLabel">Assign Standards to Review</h6>
       </div>
 
-      <div class="modal-body">
+      <div className="modal-body">
       
 
       {/* ------Navbar */}
-      <div class="container">
-  <nav class="navbar navbar-expand-lg bg-light">
-    <div class="container-fluid">
+      <div className="container">
+  <nav className="navbar navbar-expand-lg bg-light">
+    <div className="container-fluid">
      {
     
-     Object.keys(list).map((v)=>{
-      return <>
-       <li style={{color:`${name===v?"blue":"Black"}`}}   onClick={dataHandler.bind(null,v)} class="navbar-brand report_navbar">{v}</li>
-      <svg class ="bi bi-info-circle report_icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
+     Object.keys(list).map((v , index)=>{
+      return <div key={index}>
+       <li  style={{color:`${name===v?"blue":"Black"}`}}   onClick={dataHandler.bind(null,v)} className="navbar-brand report_navbar">{v}</li>
+      <svg className="bi bi-info-circle report_icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
         <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
          <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
       </svg>
       
-      </>
+      </div>
      })}
       
     </div>
@@ -307,27 +315,27 @@ return(
             <th> Standard </th>
             <th> Description </th>
             </tr>
-            <hr class="report_hr"></hr>
-            <tr class="report_td">
-            <td><input type="checkbox" id="standard1" name="standard1" onChange={countHandler}></input></td>
+            <hr className="report_hr"></hr>
+            <tr className="report_td">
+            <td><input type="checkbox" id="standard1" name="standard1" onChange={countHandler} {...register("standard1")}></input></td>
               <td> {data[0]}</td>
               <td> {data[1]} </td>
             </tr>
-            <hr class="report_hr"></hr>
-            <tr class="report_td">
-            <td><input type="checkbox" id="standard2" name="standard2" onChange={countHandler}></input></td>
+            <hr className="report_hr"></hr>
+            <tr className="report_td">
+            <td><input type="checkbox" id="standard2" name="standard2" onChange={countHandler} {...register("standard2")}></input></td>
               <td> {data[2]}</td>
               <td> {data[3]} </td>
             </tr>
-            <hr class="report_hr"></hr>
-            <tr class="report_td">
-            <td><input type="checkbox" id="standard3" name="standard3" onChange={countHandler}></input></td>
+            <hr className="report_hr"></hr>
+            <tr className="report_td">
+            <td><input type="checkbox" id="standard3" name="standard3" onChange={countHandler} {...register("standard3")}></input></td>
               <td> {data[4]}</td>
               <td> {data[5]} </td>
             </tr>
-            <hr class="report_hr"></hr>
-            <tr class="report_td">
-            <td><input class ="report_checkbox" type="checkbox" id="standard4" name="standard4" onChange={countHandler}></input></td>
+            <hr className="report_hr"></hr>
+            <tr className="report_td">
+            <td><input className="report_checkbox" type="checkbox" id="standard4" name="standard4" onChange={countHandler} {...register("standard4")}></input></td>
               <td> {data[6]}</td>
               <td> {data[7]} </td>
             </tr>
@@ -335,9 +343,10 @@ return(
             {/* onClick={()=>alert("Standards added successfully!") */}
     </table>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary modal_btn" data-bs-dismiss={close?"modal":""} onClick={()=>message()}>ADD STANDARDS TO REVIEW</button>
-        <button type="button" class="btn btn-secondary modal_btn" data-bs-dismiss="modal">CANCEL</button>
+      <div className="modal-footer">
+        <button type="button" className="btn btn-primary modal_btn" data-bs-dismiss="modal" onClick={()=>message()}>ADD STANDARDS TO REVIEW</button>
+        {/* data-bs-dismiss={close?"modal":""}  */}
+        <button type="button" className="btn btn-secondary modal_btn" data-bs-dismiss="modal">CANCEL</button>
       </div>
     </div>
   </div>
@@ -356,7 +365,7 @@ return(
     axios({
       method: 'get',
       maxBodyLength: Infinity,
-        url: '/user/search',
+        url: `${BACKEND_URL}/user/search`,
         params : data,
       
         credentials: "include", 
@@ -418,7 +427,7 @@ return(
     axios({
       method: 'get',
       maxBodyLength: Infinity,
-      url: '/project',
+      url: `${BACKEND_URL}/project`,
         params : data,
       
         credentials: "include", 
@@ -531,8 +540,8 @@ return(
 </div>
 
 <div className='custom3btn'>
-<button className="btn btn-primary btn_custom " type="submit">SAVE AS DRAFTS</button>
-<button className="btn btn-primary btn_custom1 mx-2" type="submit" onClick={
+<button className="btn btn-primary " type="submit">SAVE AS DRAFTS</button>
+<button className="btn btn-success btn_custom1 mx-2" type="submit" onClick={
         handleSubmit(onSubmit)}>SUBMIT REVIEW</button>
 <button className="btn btn-primary btn_custom2" onClick={()=>{navigate('/view/assignedProjects')}}>CANCEL</button>
 </div>

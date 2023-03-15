@@ -7,6 +7,7 @@ import { LoginDetails } from "../../Login/LoginReducer/LoginSlice";
 import "./Navbar.css";
 import { userLoginCheck } from "../../../helpers/userLoginCheck";
 import Cookies from "universal-cookie";
+import BACKEND_URL from '../../../backendUrl'
 export const Navbar = () => {
   // const [login, setLogin] = useState(false)
   let dispatch = useDispatch();
@@ -28,7 +29,7 @@ export const Navbar = () => {
       method: "post",
       maxBodyLength: Infinity,
 
-      url: `/user/logout`,
+      url: `${BACKEND_URL}/user/logout`,
       credentials: "include", 
       withCredentials:true,
 
@@ -317,9 +318,14 @@ export const Navbar = () => {
                         aria-labelledby="dropdownMenuButton1"
                       >
                         <li>
-                          <a className="dropdown-item" href="#">
+                        <button
+                            className="dropdown-item"
+                            onClick={() => {
+                              Logout();
+                            }}
+                          >
                             Logout
-                          </a>
+                          </button>
                         </li>
                         <li>
                           <a className="dropdown-item" href="#">
