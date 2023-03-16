@@ -114,10 +114,14 @@ function merge(arr1,arr2){
     if(arr1.length===0 || arr2.length===0){
        return []
     }
-
-    let result = arr1.map((item) => ({
-        ...arr2.find((item2) => item2.project_number === item.project_number)
-    }))
+    let result = []
+    arr1.map((item) => {
+        let ele = arr2.find((item2) => item2.project_number === item.project_number)
+        if(ele && ele.hasOwnProperty('project_number')){
+             result.push(ele)
+        }
+})
+    
     console.log("Merging result is : " + JSON.stringify(result))
     return result
 }
