@@ -78,8 +78,9 @@ async function getProjectByName(name,id,userId){
                 }   
             ]
         },
-        attributes : ['project_name','project_number']
-    },{raw:true})
+        attributes : ['project_name','project_number'],
+        raw:true
+    })
     
     return new Response(200,"SUCCESS",`Projects related to userId ${userId}.`,projects)
    }catch(error){

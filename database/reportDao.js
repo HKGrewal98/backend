@@ -112,14 +112,17 @@ async function getProjectLinkedToReports(reportId,userId){
                 model:project,
                 as:"project_number_fk",
                 attributes:["project_number","project_name"]
-            }
+            },
+            raw:true
         })
 
-        const projects = result.map((data) => data.project_number_fk)
-
+        const projects = result.map((data) => ({
+            project_number:data['project_number_fk.project_number'],
+            project_name:data['project_number_fk.project_name']
+        }))
+         
+    
         return new Response(200,"SUCCESS",`Projects Linked to reportId ${reportId}`,projects)
-        
-
     }catch(error){
              console.log("Error in fetching projects linked to a report " + error)
              return new Response(500,"FAILURE","Unknown error occured.",null)

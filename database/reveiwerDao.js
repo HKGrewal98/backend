@@ -36,41 +36,103 @@ async function searchForReveiwer(req){
     const {projectId,reportId,name,id} = req.query
     const {limit,offset} = getLimitAndOffset(req)
     const userId = req.user.userId
+    if(!projectId && !reportId && !name && !id){
+        return new Response(400,"FAILURE","projectId,reportId,name or id required in request query",null)
+    }
      
     try{
        let query=null
        let replacements=null
+       let projectResult = null
+       let reportResult= null
+       let nameAndIdResult= null
+
        if(projectId){
          query=`SELECT distinct(p.project_number), p.project_name FROM project_info p INNER JOIN report r ON 
          p.project_number = r.project_number AND r.reviewer_id = ? WHERE (p.project_number LIKE ? OR 
          p.project_number LIKE ? OR p.project_number LIKE ?) limit ? offset ?`
          replacements=[userId,`%${projectId}`,`%${projectId}%`,`${projectId}%`,limit,offset]
-       }else if(reportId){
+         projectResult = await executeRawQuery(query,replacements)
+       } 
+       
+       if(reportId){
         query=`SELECT distinct(p.project_number), p.project_name FROM project_info p INNER JOIN report r ON 
         p.project_number = r.project_number AND r.reviewer_id = ? WHERE (r.report_number LIKE ? OR 
         r.report_number LIKE ? OR r.report_number LIKE ?) limit ? offset ?`
         replacements=[userId,`%${reportId}`,`%${reportId}%`,`${reportId}%`,limit,offset]
-       }else if(name || id){
+        reportResult =  await executeRawQuery(query,replacements)
+       }
+       
+       if(name || id){
         query=`select distinct(p.project_number), p.project_name from project_info p inner join manufacturer m on 
         p.transacting_customer=m.id inner join report r on p.project_number = r.project_number where (
         r.reviewer_id = ? and  (m.name like ? or m.name like ? or m.name like ? or m.id like ? or
         m.id like ? or m.id like ?)) limit ? offset ?`
         replacements=[userId,`%${name}`,`%${name}%`,`${name}%`,`%${id}`,`%${id}%`,`${id}%`,limit,offset]
-       }else{
-        return new Response(400,"FAILURE","projectId,reportId,name or id required in request query",null)
+        nameAndIdResult =  await executeRawQuery(query,replacements)
        }
-
-       const result = await sequelize.query(query,{
-              replacements:replacements,
-              raw:true,
-              type:QueryTypes.SELECT
-       })
-
-       return new Response(200,"SUCCESS","Search Result",result)
+      
+       const finalResult = mergeResults(projectResult,reportResult,nameAndIdResult)
+      
+       return new Response(200,"SUCCESS","Search Result",finalResult)
     }catch(error){
         console.log("Error in search api for the reveiwer ==> ",error)
         return new Response(500,"FAILURE",`Unknown error occured.`,null)
     }
+}
+
+async function executeRawQuery(query,replacements){
+    return await sequelize.query(query,{
+                                replacements:replacements,
+                                raw:true,
+                                type:QueryTypes.SELECT
+                            })
+}
+
+function mergeResults(projectResult,reportResult,nameAndIdResult){
+       
+    if(projectResult && !reportResult && !nameAndIdResult){
+        return projectResult
+    }
+
+    if(!projectResult && reportResult && !nameAndIdResult){
+        return reportResult
+    }
+
+    if(!projectResult && !reportResult && nameAndIdResult){
+        return nameAndIdResult
+    }
+
+    if(projectResult && reportResult && !nameAndIdResult){
+         return merge(projectResult,reportResult) 
+    }
+
+    if(projectResult && !reportResult && nameAndIdResult){
+         return merge(projectResult,nameAndIdResult)
+    }
+
+    if(!projectResult && reportResult && nameAndIdResult){
+        return merge(reportResult,nameAndIdResult)
+    }
+    
+    if(projectResult && reportResult && nameAndIdResult){
+        let arr3 = merge(projectResult,reportResult)
+        return merge(arr3,nameAndIdResult)
+    }
+
+}
+
+function merge(arr1,arr2){
+    
+    if(arr1.length===0 || arr2.length===0){
+       return []
+    }
+
+    let result = arr1.map((item) => ({
+        ...arr2.find((item2) => item2.project_number === item.project_number)
+    }))
+    console.log("Merging result is : " + JSON.stringify(result))
+    return result
 }
 
 async function getReviwerNotifications(userId,req){

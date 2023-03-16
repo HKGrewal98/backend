@@ -43,23 +43,83 @@ async function getManufactureOrProjectInfo(req,res){
     }
 
     let response;
+    let projectResult = null
+    let reportResult= null
+    let nameAndIdResult= null
 
     console.log("Get Request getManufactureOrProjectInfo ==> " + JSON.stringify(req.query))
 
     if(projectId){
         response = await projectDao.getProjectByName(null,projectId,req.user.userId)
-        return createResponse(response,res)
+        projectResult = response.getStatusCode() === 200 ? response.getData() : [];
     }
 
     if(reportId){
         response = await reportDao.getProjectLinkedToReports(reportId,req.user.userId)
-        return createResponse(response,res)
+        reportResult = response.getStatusCode() === 200 ? response.getData() : [];
     }
 
     if(name || id){
         response = await userDao.getProjectByManufactureNameOrId(name,id)
-        return createResponse(response,res)
+        nameAndIdResult = response.getStatusCode() === 200 ? response.getData() : [];
     }
+
+    console.log("Project")
+    console.table(projectResult)
+    console.log("Report")
+    console.table(reportResult)
+    console.log("Manufacturer")
+    console.table(nameAndIdResult)
+  
+   let finalResult = mergeResults(projectResult,reportResult,nameAndIdResult)
+
+   return res.json((new Response(200,"SUCCESS","Search Result",finalResult)).getSuccessObject())
+}
+
+function mergeResults(projectResult,reportResult,nameAndIdResult){
+       
+    if(projectResult && !reportResult && !nameAndIdResult){
+        return projectResult
+    }
+
+    if(!projectResult && reportResult && !nameAndIdResult){
+        return reportResult
+    }
+
+    if(!projectResult && !reportResult && nameAndIdResult){
+        return nameAndIdResult
+    }
+
+    if(projectResult && reportResult && !nameAndIdResult){
+         return merge(projectResult,reportResult) 
+    }
+
+    if(projectResult && !reportResult && nameAndIdResult){
+         return merge(projectResult,nameAndIdResult)
+    }
+
+    if(!projectResult && reportResult && nameAndIdResult){
+        return merge(reportResult,nameAndIdResult)
+    }
+    
+    if(projectResult && reportResult && nameAndIdResult){
+        let arr3 = merge(projectResult,reportResult)
+        return merge(arr3,nameAndIdResult)
+    }
+
+}
+
+function merge(arr1,arr2){
+    
+    if(arr1.length===0 || arr2.length===0){
+       return []
+    }
+
+    let result = arr1.map((item) => ({
+        ...arr2.find((item2) => item2.project_number === item.project_number)
+    }))
+    console.log("Merging result is : " + JSON.stringify(result))
+    return result
 }
 
 
@@ -98,4 +158,4 @@ function createResponse(response,res){
 } 
 
 module.exports = {saveProject,getProjectsByName,getManufactureOrProjectInfo,getAllProjectInformation,
-                 getNotifications,getAllProjectsForAnEngineer}
+                 getNotifications,getAllProjectsForAnEngineer,mergeResults,merge}
