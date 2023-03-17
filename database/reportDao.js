@@ -143,7 +143,7 @@ async function getAllReportsBasedOnDocumentType(projectId,screenId,req){
     r.created_at as 'report_created_at' , d.file_id  , d.original_file_name , d.type as 'file_type' ,
      d.submitted_by as 'file_uploaded_by', dt.name as 'file_sub_type' , st.name as 'report_status' from report r inner join report_documents d 
     on r.report_number = d.report_id inner join document_type dt on d.sub_type = dt.id inner join status_type st on
-    st.id = r.status_id where r.project_number=? and r.is_saved=? and d.sub_type in (?) ${isReviewer?alterQuery:''} limit ? offset ?`
+    st.id = r.status_id where r.project_number=? and r.is_saved=? and d.isDeleted=false and d.sub_type in (?) ${isReviewer?alterQuery:''} limit ? offset ?`
 
     try{
         const result = await sequelize.query(query,

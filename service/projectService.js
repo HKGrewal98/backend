@@ -60,16 +60,16 @@ async function getManufactureOrProjectInfo(req,res){
     }
 
     if(name || id){
-        response = await userDao.getProjectByManufactureNameOrId(name,id)
+        response = await userDao.getProjectByManufactureNameOrId(name,id,req.user.userId)
         nameAndIdResult = response.getStatusCode() === 200 ? response.getData() : [];
     }
 
     console.log("Project")
-    console.table(projectResult)
+    console.info(projectResult)
     console.log("Report")
-    console.table(reportResult)
+    console.info(reportResult)
     console.log("Manufacturer")
-    console.table(nameAndIdResult)
+    console.info(nameAndIdResult)
   
    let finalResult = mergeResults(projectResult,reportResult,nameAndIdResult)
 
