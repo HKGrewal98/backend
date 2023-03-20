@@ -60,6 +60,10 @@ reportRoute.get('/:id',async (req,res)=>{
       return await reportService.getAllInformationByReportId(id,res)
 })
 
+reportRoute.get('/review/standards',async (req,res)=>{
+      return await reportService.getAllReportReviewStandards(res)
+})
+
 
 module.exports = reportRoute
 

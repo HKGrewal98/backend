@@ -16,6 +16,7 @@ const path = require('path')
 const reveiwerService = require('../service/reveiwerService')
 const FileType = require('../service/staticData/FileType')
 const os = require('os')
+const reviewStandardTypes = require('../service/staticData/ReviewsStandardTypes')
 
 const updateKeyChecks = {
     report : ['report_name','receiving_customer','reviewer_id','products_covered','models','comments'],
@@ -68,6 +69,16 @@ async function saveReport(req,res){
                 throw new BadRequestError('Missing files report/certificate. Either File size is too large , or incorrect extension or file is not added in the request.')
             }
 
+            const {reviewIds} = req.body
+            let reviewStandardList = null
+
+            if(reviewIds){
+                reviewStandardList = reviewIds.split(',')
+                if(! await reviewStandardTypes.validateReviewIds(reviewStandardList)){
+                    throw new BadRequestError('Invalid Review Standard Ids.')
+                }
+            }
+
             const response = await reportDao.saveReport(req.body,userId,(hasReport || hasCertificate))
 
             console.log(response)
@@ -103,6 +114,14 @@ async function saveReport(req,res){
                         }
                     }
                 })
+
+                
+                if(reviewIds){
+                    const reviewStandardResponse = await reportDao.createReportStandards(response.data.id,reviewStandardList)
+                    if(reviewStandardResponse.getStatusCode() !== 200){
+                        throw new IllegalStateError("Unknown error occured")
+                    }
+                }  
 
             }else{
                 console.log("Report could not be saved for creator with id " + userId)
@@ -286,14 +305,10 @@ async function deleteDocument(req,res){
             return res.status(400).json((new Response(400,"FAILURE","Invalid doc_id. No data exists.",null)).getErrorObject())
         }
 
-        const containerName = report_id.toLowerCase()
         let deleteResponse=null
         if(count === 1){
-            await azureStorage.deleteContainer(containerName)
             deleteResponse =  await reportDao.deleteDocument(doc_id,report_id)
         }else{
-            const blobName = document[0]['report_id_fk.storage_file_name']
-            await azureStorage.deleteBlob(blobName,containerName)
             deleteResponse = await reportDao.deleteDocument(doc_id,null)
         }
       
@@ -373,6 +388,11 @@ async function updateReportInfo(body,res){
 
 }
 
+async function getAllReportReviewStandards(res){
+    const response = await reportDao.getAllReportReviewStandards()
+    createResponse(response,res)
+}
+
 
 function createResponse(response,res){
     if(response.getStatusCode() !== 200){
@@ -383,7 +403,7 @@ function createResponse(response,res){
 } 
 
 module.exports = {saveReport,getReportsWithStatusCount,deleteFilesFromLocal,downloadDocumentRelatedToReport,
-                 updateDocument,deleteDocument,getAllInformationByReportId,updateReportInfo}
+                 updateDocument,deleteDocument,getAllInformationByReportId,updateReportInfo,getAllReportReviewStandards}
 
 
 

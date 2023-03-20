@@ -11,6 +11,8 @@ const reportStatus = require('../models/ReportStatus')
 const statusType = require('../service/staticData/StatusType')
 const comments = require('../models/ReviewerComments')
 const user = require('../models/User')
+const reviewStandards = require('../models/ReviewStandards')
+const reviewStandardMapping = require('../models/ReviewStandardsMapping')
 
 async function saveReport(body,userId,documentPresent){
 
@@ -227,7 +229,10 @@ async function getDocumentBasedOnDocId(docId){
     try{
         const result = await document.findOne({
             where:{
-                file_id:{[Op.eq]:docId}
+               [Op.and]:[
+                {file_id:{[Op.eq]:docId}},
+                {isDeleted:{[Op.eq]:false}}  
+               ]       
             },
             raw:true,
             attributes:['file_id','storage_file_name','type','report_id']
@@ -266,7 +271,7 @@ async function deleteDocument(docId,reportId){
          
         const result = await sequelize.transaction(async (t1)=>{
             
-            const docResult = await document.destroy({
+            const docResult = await document.update({isDeleted:true},{
                 where:{
                     file_id:{[Op.eq]:docId}
                 }
@@ -307,7 +312,10 @@ async function getDocumentsCountRelatedToReport(reportId){
         raw:true,
         include:{
             model:document,
-            as:'report_id_fk'
+            as:'report_id_fk',
+            where:{
+                isDeleted:{[Op.eq]:false}
+            }
         }
        })
 
@@ -377,16 +385,25 @@ async function getAllInformationByReportId(reportId){
 
          const documentInfo = await document.findAll({
             where:{
-                report_id:{
-                    [Op.eq]:reportId
-                }
+               [Op.and]:[
+                {report_id:{[Op.eq]:reportId}},
+                {isDeleted:{[Op.eq]:false}}
+               ]
             }
          })
+
+         let query = `select * from review_standards where id in (select standard_id from report_standards_mapping where report_id=?)`
+         const reviewMapping = await sequelize.query(query,{
+            replacements:[reportId],
+            raw:true,
+            type:QueryTypes.SELECT
+         }) 
 
 
         const result = {
             report:reportInfo,
-            documents:documentInfo
+            documents:documentInfo,
+            standards:reviewMapping
         }
          
 
@@ -417,7 +434,36 @@ async function updateReport(query){
     }
 }
 
+async function getAllReportReviewStandards(){
+
+    try{
+           const result = await reviewStandards.findAll()
+           return new Response(200,"SUCCESS",`Review Standards.`,result)
+    }catch(error){
+        console.error("Error in fetching review standards " + error)
+        return new Response(500,"FAILURE","Unknown error occured.",null) 
+    }
+}
+
+async function createReportStandards(reportId,standardIdList){
+  try{
+
+    for(let id of standardIdList){
+        await reviewStandardMapping.create({
+            report_id:reportId,
+            standard_id:parseInt(id)
+        })
+    }
+   
+    return new Response(200,"SUCCESS",`Review Standards Registered.`,null)
+  }catch(error){
+    console.error("Error in saving review standards " + error)
+    return new Response(500,"FAILURE","Unknown error occured.",null) 
+  }
+}
+
 module.exports = {saveReport,saveDocument,getReportsWithStatusCount,getProjectLinkedToReports,
     getAllReportsBasedOnDocumentType,getReportsWithNoDocumentsUploaded,getDocumentBasedOnFileId,
     getDocumentBasedOnDocId,updateDocument,deleteDocument,getDocumentsCountRelatedToReport,
-    recordReviewerDecision,addCommentsToTheReport,getAllInformationByReportId,updateReport}
+    recordReviewerDecision,addCommentsToTheReport,getAllInformationByReportId,updateReport,
+    getAllReportReviewStandards,createReportStandards}
