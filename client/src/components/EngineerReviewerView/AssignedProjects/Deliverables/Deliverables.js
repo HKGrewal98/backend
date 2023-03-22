@@ -51,7 +51,7 @@ export const Deliverables = () => {
   const getDeliverables = ()=>{
    
     if(ProjectNumberRedux !== undefined ){
-      console.log("check projectnumbe redux", ProjectNumberRedux)
+      // console.log("check projectnumbe redux", ProjectNumberRedux)
       dispatch(LoaderStatus(true));
       axios({
         method: "get",
@@ -72,7 +72,7 @@ export const Deliverables = () => {
             localStorage.setItem("PrevProjectNumber", JSON.stringify(response?.data?.data?.project?.project_number))
             dispatch(LoaderStatus(false));
           } else {
-            console.log("no projects yet");
+            // console.log("no projects yet");
             dispatch(LoaderStatus(false));
           }
         })
@@ -140,7 +140,7 @@ export const Deliverables = () => {
           
         })
         .then(function (response) {
-          console.log("Response From Delete in deliverables",response.data)  
+          // console.log("Response From Delete in deliverables",response.data)  
           if(response?.data?.statusCode === 200){
           setShowModalDeleteDoc(false)
           getDeliverables()  
@@ -148,7 +148,7 @@ export const Deliverables = () => {
         
         })
         .catch(function (error) {
-          console.log("Error block delete teport", error);
+          // console.log("Error block delete teport", error);
           if(error?.response?.status===401){
             dispatch(LoginDetails({}));
                 cookies.remove('connect.sid');
@@ -249,6 +249,7 @@ export const Deliverables = () => {
                           style={{ cursor: "pointer" }}
                           onClick={() => 
                             {
+                              localStorage.setItem("ReportNumber",JSON.stringify(report?.report_number))
                               dispatch(Reports({"report":report,"project":DeliverableMain.project}))
                               navigate("/view/editReport")}}
                         >
@@ -332,6 +333,7 @@ export const Deliverables = () => {
                           style={{ cursor: "pointer" }}
                           onClick={() => 
                             {
+                              localStorage.setItem("ReportNumber",JSON.stringify(report?.report_number))
                               dispatch(Reports({"report":report,"project":DeliverableMain.project}))
                               navigate("/view/viewReport")}}
                           className="m-1"

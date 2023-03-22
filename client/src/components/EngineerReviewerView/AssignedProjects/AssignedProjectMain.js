@@ -119,7 +119,7 @@ export const AssignedProjectMain = () => {
    </div>
    <div className='assProjectContainer'>
     <div className='leftNavAssigned'>
-        <div className='sideNavContainer' >
+        <div className='sideNavContainer' style={{height:"100%", overflowY:"scroll"}}>
           <div className='mainProjectsParent' style={{cursor:"pointer"}} onClick={()=>{setProjectsOpen(!projectsOpen)}}>
             {projectsOpen?<>
             <img src = {MinusIcon} />
@@ -160,9 +160,9 @@ export const AssignedProjectMain = () => {
                 {recentProjectsOpen? <div className='recentprojectsinnermost'>
                   {AllProjects?.length>0 ? 
                   AllProjects.map((data,index)=>{
-                    return( <>
+                    return( 
                    
-                      <div key={data?.project_number} 
+                      <div key={index} 
                       onClick={() => { 
                         setSelectedProjectState(data)
                        localStorage.setItem("SelectedProject", JSON.stringify(data)) 
@@ -171,7 +171,7 @@ export const AssignedProjectMain = () => {
                     }
                       className= {SelectedProjectState?.project_number === data.project_number ? "projectListItems activeProjectItem":"projectListItems"}
                     >{data?.project_number}</div>
-                    </>
+                    
                     
                     
                   )

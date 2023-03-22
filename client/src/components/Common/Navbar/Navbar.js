@@ -19,7 +19,7 @@ export const Navbar = () => {
   const cookies = new Cookies()
 
   const Logout = () => {
-    console.log("Logout clicked");
+    // console.log("Logout clicked");
      // console.log(data)
      var myHeaders = new Headers();
      myHeaders.append("Content-Type", "application/json");

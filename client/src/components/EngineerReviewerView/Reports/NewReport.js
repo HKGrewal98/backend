@@ -39,7 +39,7 @@ export const NewReport=()=>{
   const [count,setCount] = useState(0)
 
   const dataHandler=(name, e)=>{
-    console.log(name)
+    // console.log(name)
     if(list.hasOwnProperty(name)){
       setName(name)
       setdata(list[name])
@@ -58,7 +58,7 @@ export const NewReport=()=>{
     }
   }
   function countHandler(e){
-    console.log(count)
+    // console.log(count)
     if(e.target.checked){
       setCount((prev)=>prev+1)
       setClose(true)
@@ -121,7 +121,7 @@ export const NewReport=()=>{
     formData.append('standard3', data.standard3);
     formData.append('standard4', data.standard4);
     
-    console.log("form data",data, formData)
+    // console.log("form data",data, formData)
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append('Access-Control-Allow-Origin', 'http://localhost:8081')
@@ -141,7 +141,7 @@ export const NewReport=()=>{
         withCredentials:true,
      
     }).then(res=>{
-      console.log(res)
+      // console.log(res)
       dispatch(LoaderStatus(false))
       if(res?.data?.statusCode===200){
         setShowGreen(true)
@@ -154,7 +154,7 @@ export const NewReport=()=>{
        
       })
       .catch(error=>{
-        console.log("Error block new reports", error);
+        // console.log("Error block new reports", error);
         if(error?.code==="ERR_NETWORK"){
           dispatch(LoginDetails({}));
               cookies.remove('connect.sid');
@@ -221,7 +221,7 @@ return(
   
   onChange={debounce(async (e) => {
     let str = e.target.value
-    console.log("str check", str)
+    // console.log("str check", str)
     let data={
       name: str
     }
@@ -235,7 +235,7 @@ return(
         withCredentials:true,
     })
     .then(function (response) {
-      console.log(response.data);
+      // console.log(response.data);
       if(response.data?.data.length>0){
 
         setSearchResults(response.data?.data)
@@ -358,7 +358,7 @@ return(
   <input type="availableReviewers" className="form-control custom_txtbox" id="reviewer_id" {...register("reviewer_id",{ required: true})}
    onChange={debounce(async (e) => {
     let str = e.target.value
-    console.log("str check", str)
+    // console.log("str check", str)
     let data={
       name: str
     }
@@ -420,7 +420,7 @@ return(
   <input type="availableReviewers" className="form-control custom_txtbox" id="projectNumber" {...register("project_number",{ required: true})}
    onChange={debounce(async (e) => {
     let str = e.target.value
-    console.log("str check", str)
+    // console.log("str check", str)
     let data={
       name: str
     }

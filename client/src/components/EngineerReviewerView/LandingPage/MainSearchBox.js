@@ -77,7 +77,7 @@ export const MainSearchBox = () => {
   
 //  useEffect(()=>{console.log("search result check", searchResult)},[searchResult])
  const showProject=(data)=>{
-  console.log("Project number check main search box" , data)
+  // console.log("Project number check main search box" , data)
   dispatch(ProjectNumber(data))
   localStorage.setItem("SelectedProject", JSON.stringify(data))
   navigate('/view/assignedProjects')

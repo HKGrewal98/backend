@@ -61,7 +61,7 @@ export const LandingPage = () => {
         withCredentials:true,
     })
     .then(function (response) {
-      console.log(response.data);
+      // console.log(response.data);
       setShow(true)
       setSearchResult(response.data?.data)
       if(response.data?.isLoggedIn == false){

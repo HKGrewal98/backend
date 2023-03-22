@@ -71,14 +71,14 @@ export const EquipmentLog = () => {
           localStorage.setItem("PrevProjectNumber", JSON.stringify(response?.data?.data?.project?.project_number))
           dispatch(LoaderStatus(false));
         } else {
-          console.log("no projects yet");
+          // console.log("no projects yet");
           dispatch(LoaderStatus(false));
         }
 
       
       })
       .catch(function (error) {
-        console.log("Error block equipment log", error);
+        // console.log("Error block equipment log", error);
         if(error?.response?.status===401){
           dispatch(LoginDetails({}));
               cookies.remove('connect.sid');
@@ -136,7 +136,7 @@ export const EquipmentLog = () => {
           
         })
         .then(function (response) {
-          console.log("Response From Delete in equipment log",response.data)  
+          // console.log("Response From Delete in equipment log",response.data)  
           if(response?.data?.statusCode === 200){
           setShowModalDeleteDoc(false)
           getEquipmentlog() 
@@ -246,6 +246,7 @@ export const EquipmentLog = () => {
                         style={{ cursor: "pointer" }}
                         onClick={() => 
                           {
+                            localStorage.setItem("ReportNumber",JSON.stringify(data?.report_number))
                             dispatch(Reports({"report":data,"project":EquipmentLogData.project}))
                             navigate("/view/editReport")}}
                       >
@@ -334,6 +335,7 @@ export const EquipmentLog = () => {
                         xmlns="http://www.w3.org/2000/svg"
                         style={{cursor:"pointer"}}
                        onClick={()=>{
+                        localStorage.setItem("ReportNumber",JSON.stringify(data?.report_number))
                         dispatch(Reports({"report":data,"project":EquipmentLogData.project}))
                         navigate('/view/viewReport')}}
                       >

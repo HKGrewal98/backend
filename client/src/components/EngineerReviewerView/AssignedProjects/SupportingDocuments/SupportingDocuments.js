@@ -71,7 +71,7 @@ export const SupportingDocuments = () => {
             localStorage.setItem("PrevProjectNumber", JSON.stringify(response?.data?.data?.project?.project_number))
             dispatch(LoaderStatus(false));
           } else {
-            console.log("no projects yet");
+            // console.log("no projects yet");
             dispatch(LoaderStatus(false));
           }
         })
@@ -136,7 +136,7 @@ export const SupportingDocuments = () => {
           
         })
         .then(function (response) {
-          console.log("Response From Delete in supporting docs",response.data)  
+          // console.log("Response From Delete in supporting docs",response.data)  
           if(response?.data?.statusCode === 200){
           setShowModalDeleteDoc(false)
           getSupportingDocuments() 
@@ -266,6 +266,7 @@ export const SupportingDocuments = () => {
                           style={{cursor:"pointer"}}
                           onClick={() => 
                             {
+                              localStorage.setItem("ReportNumber",JSON.stringify(data?.report_number))
                               dispatch(Reports({"report":data,"project":SupportingDocumentsData.project}))
                               navigate("/view/editReport")}}
                         >
@@ -354,6 +355,7 @@ export const SupportingDocuments = () => {
                           xmlns="http://www.w3.org/2000/svg "
                           style={{ cursor: "pointer" }}
                           onClick={() => {
+                            localStorage.setItem("ReportNumber",JSON.stringify(data?.report_number))
                             dispatch(Reports({"report":data,"project":SupportingDocumentsData.project}))
                             navigate("/view/viewReport")}}
                         >

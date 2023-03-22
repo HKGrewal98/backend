@@ -67,7 +67,13 @@ export const Login = () => {
       }
       
       }
-        ).catch(err=>{console.log(err)})
+        ).catch(err=>{console.log(err)
+        if(err?.response?.status == 401){
+          setAlertValue("Invalid UserId or Password")
+          setShowRed(true)
+      
+        }
+        })
       
 };
 
@@ -75,7 +81,7 @@ export const Login = () => {
   dispatch(LoaderStatus(false))
   let cookieCheck = cookies.get('connect.sid');
   // console.log("Cookie Check", cookieCheck)
-  if(ULogged?.is_engineer===true || cookieCheck != undefined){
+  if(ULogged?.is_engineer===true || ULogged?.is_reviewer===true || cookieCheck != undefined){
     navigate('/view/landingPage')
   }
   let AlertMessage = JSON.parse(localStorage.getItem("AlertMessage"))
@@ -84,6 +90,19 @@ export const Login = () => {
     setAlertValue(AlertMessage)
   }
  },[])
+ useEffect(()=>{
+  dispatch(LoaderStatus(false))
+  let cookieCheck = cookies.get('connect.sid');
+  // console.log("Cookie Check", cookieCheck)
+  if(ULogged?.is_engineer===true || ULogged?.is_reviewer===true || cookieCheck != undefined){
+    navigate('/view/landingPage')
+  }
+  let AlertMessage = JSON.parse(localStorage.getItem("AlertMessage"))
+  if(AlertMessage != undefined){
+    setShowRed(true)
+    setAlertValue(AlertMessage)
+  }
+ },[ULogged])
 
   return (
     <>

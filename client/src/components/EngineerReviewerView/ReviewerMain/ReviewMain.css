@@ -5,7 +5,7 @@ border-style:groove;
     margin-top: 2%;
     background-color:rgba(248, 248, 248, 1);
     justify-content: space-between;
-    width: 70rem;
+    width: 74rem;
 margin-left: 4.5rem;
 padding-left: 5px;
 padding-right: 5px;
@@ -45,4 +45,8 @@ font-size:88%;
     border-color: rgba(33, 182, 215, 1);
     background-color: 
     rgba(33, 182, 215, 1);
+}
+
+.table{
+    margin-bottom: 0 !important;
 }

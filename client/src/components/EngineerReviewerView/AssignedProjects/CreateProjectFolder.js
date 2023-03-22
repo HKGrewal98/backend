@@ -21,7 +21,7 @@ const CreateProjectFolder = () => {
   const dispatch = useDispatch()
   // const watchFields = watch(["showAge", "number"])
   const onSubmit= ((data) => {
-    console.log(data)
+    // console.log(data)
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append('Access-Control-Allow-Origin', 'http://localhost:8081')
@@ -39,7 +39,7 @@ const CreateProjectFolder = () => {
         withCredentials:true,
     })
     .then(function (response) {
-      console.log(JSON.stringify(response.data));
+      // console.log(JSON.stringify(response.data));
       if(response.data.statusCode===200){
         setShowModalGreen(true)
         setProjectCreatedData({"project_number":response.data?.data?.id,"project_name":data.project_name})
@@ -61,11 +61,11 @@ const CreateProjectFolder = () => {
   });
   const handleClose = (e)=>{
     e.preventDefault()
-    console.log("Close CLicked")
+    // console.log("Close CLicked")
     navigate('/view/landingPage')
   }
   useEffect(()=>{
-    console.log("search results check", searchResults)
+    // console.log("search results check", searchResults)
   },[searchResults])
   return (
 
@@ -179,7 +179,7 @@ const CreateProjectFolder = () => {
             <input  className='createProjectFolderBoxBorder' type="Text" placeholder="Transacting Customer" autoComplete='off' id="transacting_customer"  {...register("transacting_customer",{ minLength:2, maxLength: 20, required:true })}
             onChange={debounce(async (e) => {
               let str = e.target.value
-              console.log("str check", str)
+              // console.log("str check", str)
               let data={
                 name: str
               }
@@ -193,7 +193,7 @@ const CreateProjectFolder = () => {
                   withCredentials:true,
               })
               .then(function (response) {
-                console.log(response.data);
+                // console.log(response.data);
                 if(response.data?.data.length>0){
 
                   setSearchResults(response.data?.data)
@@ -228,7 +228,7 @@ const CreateProjectFolder = () => {
           </div>
             </div>
             <button className="btn btn-dark createProjectFolderBoxBorder align-self-start" onClick={(e)=>{e.preventDefault()
-            console.log("Find custmer clcik")
+            // console.log("Find custmer clcik")
             }}>Find Customer</button>
           </div></div>
 
@@ -240,7 +240,7 @@ const CreateProjectFolder = () => {
             <input type="Text" className='createProjectFolderBoxBorder' placeholder="Report Receiving Customer" id='receiving_customer'  {...register("receiving_customer",{ minLength:2, maxLength: 20, required:true })}
              onChange={debounce(async (e) => {
               let str = e.target.value
-              console.log("str check", str)
+              // console.log("str check", str)
               let data={
                 name: str
               }
@@ -254,7 +254,7 @@ const CreateProjectFolder = () => {
                   withCredentials:true,
               })
               .then(function (response) {
-                console.log(response.data);
+                // console.log(response.data);
                 if(response.data?.data.length>0){
 
                   setSearchResults1(response.data?.data)
@@ -289,7 +289,7 @@ const CreateProjectFolder = () => {
           </div>
             </div>
             <button className="btn btn-dark createProjectFolderBoxBorder" onClick={(e)=>{e.preventDefault()
-            console.log("Find custmer clcik")
+            // console.log("Find custmer clcik")
             }}>Find Customer</button>
             </div> </div>          
           

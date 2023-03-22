@@ -54,7 +54,7 @@ const getCorrespondence = ()=>{
     // console.log("ProjectNumberRedux",ProjectNumberRedux," SelectedProject",SelectedProject)
     let url
     if(ProjectNumberRedux=== undefined){
-      console.log("Inside projenumberedux undefine")
+      // console.log("Inside projenumberedux undefine")
       url= `${BACKEND_URL}/project/${SelectedProject?.project_number}`
     }
     else{
@@ -80,7 +80,7 @@ const getCorrespondence = ()=>{
         localStorage.setItem("PrevProjectNumber", JSON.stringify(response?.data?.data?.project?.project_number))
         dispatch(LoaderStatus(false));
       } else {
-        console.log("no projects yet");
+        // console.log("no projects yet");
         dispatch(LoaderStatus(false));
       }
 
@@ -89,7 +89,7 @@ const getCorrespondence = ()=>{
       console.log("Error block correspondence", error);
       // dispatch(LoaderStatus(false))
       if(error?.response?.status===401){
-        console.log("inside 401 correspondence")
+        // console.log("inside 401 correspondence")
         cookies.remove('connect.sid');
         
         localStorage.setItem("AlertMessage", JSON.stringify("Session Expired...Please Login Again"))
@@ -151,7 +151,7 @@ useEffect(()=>{
           
         })
         .then(function (response) {
-          console.log("Response From Delete in correspondence",response.data)  
+          // console.log("Response From Delete in correspondence",response.data)  
           if(response?.data?.statusCode === 200){
           setShowModalDeleteDoc(false)
           getCorrespondence()  
@@ -159,7 +159,7 @@ useEffect(()=>{
         
         })
         .catch(function (error) {
-          console.log("Error block delete teport", error);
+          // console.log("Error block delete teport", error);
           if(error?.response?.status===401){
             dispatch(LoginDetails({}));
                 cookies.remove('connect.sid');
@@ -262,6 +262,7 @@ useEffect(()=>{
                         style={{ cursor: "pointer" }}
                         onClick={() => 
                           {
+                            localStorage.setItem("ReportNumber",JSON.stringify(data?.report_number))
                             dispatch(Reports({"report":data,"project":CorrespondentsData.project}))
                             navigate("/view/editReport")}}
                       >
@@ -350,6 +351,7 @@ useEffect(()=>{
                         xmlns="http://www.w3.org/2000/svg"
                         style={{cursor:"pointer"}}
                         onClick={()=>{
+                          localStorage.setItem("ReportNumber",JSON.stringify(data?.report_number))
                           dispatch(Reports({"report":data,"project":CorrespondentsData.project}))
                           navigate('/view/viewReport')}}>
                         <path
