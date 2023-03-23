@@ -16,7 +16,7 @@ projectRoute.all('*',(req,res,next)=>{
 function isEngineer(req,res,next){
     return req.user.is_engineer?
            next():
-           res.json((new Response(200,"FAILURE","Person Signed in, is not an engineer.",null).getErrorObject()))
+           res.json((new Response(401,"FAILURE","Person Signed in, is not an engineer.",null).getErrorObject()))
 }
 
 projectRoute.post('/save',isEngineer,[

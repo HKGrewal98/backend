@@ -7,8 +7,22 @@ const reveiwerService = require('../service/reveiwerService')
 
 
 async function saveProject(userId,body,res){
-    const response = await projectDao.saveProject(userId,body)
+    if(!validateDates(body)){
+       return res.
+       json((new Response(400,"FAILURE","Dates are invalid. Start date must be smaller than end date / completion date.",null))
+       .getErrorObject())
+    }
+     const response = await projectDao.saveProject(userId,body)
      return createResponse(response,res)
+}
+
+function validateDates(body){
+     const {completion,start_date,end_date} = body
+     const startDate = new Date(start_date)
+     const endDate = new Date(end_date)
+     const completionDate = new Date(completion)
+    
+    return startDate.getTime() < endDate.getTime() && startDate.getTime() < completionDate.getTime() ? true : false
 }
 
 function isEngineer(req){
