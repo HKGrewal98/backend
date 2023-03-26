@@ -271,7 +271,7 @@ async function deleteDocument(docId,reportId){
          
         const result = await sequelize.transaction(async (t1)=>{
             
-            const docResult = await document.update({isDeleted:true},{
+            const docResult = await document.update({isDeleted:true,updated_at:new Date()},{
                 where:{
                     file_id:{[Op.eq]:docId}
                 }
@@ -462,8 +462,21 @@ async function createReportStandards(reportId,standardIdList){
   }
 }
 
+async function getReportBasedOnReportId(reportId){
+     try{
+        
+        const result = await report.findByPk(reportId)
+
+        return new Response(200,"SUCCESS",`Report Info for id ${reportId}.`,result)
+
+     }catch(error){
+        console.error("Error in getting report based on Id " + error)
+        return new Response(500,"FAILURE","Unknown error occured.",null) 
+     }
+}
+
 module.exports = {saveReport,saveDocument,getReportsWithStatusCount,getProjectLinkedToReports,
     getAllReportsBasedOnDocumentType,getReportsWithNoDocumentsUploaded,getDocumentBasedOnFileId,
     getDocumentBasedOnDocId,updateDocument,deleteDocument,getDocumentsCountRelatedToReport,
     recordReviewerDecision,addCommentsToTheReport,getAllInformationByReportId,updateReport,
-    getAllReportReviewStandards,createReportStandards}
+    getAllReportReviewStandards,createReportStandards,getReportBasedOnReportId}

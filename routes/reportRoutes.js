@@ -30,6 +30,11 @@ reportRoute.get('/',async (req,res)=> {
       return await reportService.getReportsWithStatusCount(req,res)
 })
 
+reportRoute.post('/additional/doc',editUpload,async (req,res) => {
+      console.log(req.file)
+      return await reportService.addAdditionalDocuments(req,res)
+})
+
 reportRoute.post('/',reportUpload,isEngineer,async (req,res)=>{ 
       console.log(req.files['report'])
       return await reportService.saveReport(req,res)

@@ -49,7 +49,7 @@ projectRoute.get('/notifications',async (req,res)=>{
     return await projectMethods.getNotifications(req,res)
 })
 
-projectRoute.get('/all',isEngineer,async (req,res)=>{
+projectRoute.get('/all',async (req,res)=>{
     return projectMethods.getAllProjectsForAnEngineer(req,res) 
  })
 

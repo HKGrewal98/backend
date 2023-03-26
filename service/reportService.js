@@ -17,6 +17,7 @@ const reveiwerService = require('../service/reveiwerService')
 const FileType = require('../service/staticData/FileType')
 const os = require('os')
 const reviewStandardTypes = require('../service/staticData/ReviewsStandardTypes')
+const alphanumeric = require('alphanumeric-id')
 
 const updateKeyChecks = {
     report : ['report_name','receiving_customer','reviewer_id','products_covered','models','comments'],
@@ -77,6 +78,13 @@ async function saveReport(req,res){
                 if(! await reviewStandardTypes.validateReviewIds(reviewStandardList)){
                     throw new BadRequestError('Invalid Review Standard Ids.')
                 }
+            }
+
+            const {issued_at} = req.body
+            const issuedAt = new Date(issued_at)
+            console.log(issuedAt)
+            if(issuedAt.getTime() > (new Date().getTime())){
+                throw new BadRequestError('Issued At Date must be less than or equal to current date.')
             }
 
             const response = await reportDao.saveReport(req.body,userId,(hasReport || hasCertificate))
@@ -388,6 +396,50 @@ async function updateReportInfo(body,res){
 
 }
 
+async function addAdditionalDocuments(req,res){
+     
+    try{
+        if(!isEngineer(req)){
+            return res.status(401).json((new Response(400,"FAILURE","Only engineer is allowed to add additional Docs.",null)).getErrorObject())  
+        }
+
+        const {reportId} = req.body
+        if(!reportId){
+          return res.status(400).json((new Response(400,"FAILURE","reportId missing in the request body.",null)).getErrorObject())    
+        }
+  
+     
+        const response = await reportDao.getReportBasedOnReportId(reportId)
+        if(response.getStatusCode()!==200){
+          return res.status(400).json((new Response(400,"FAILURE","ReportId missing in the request body.",null)).getErrorObject()) 
+        }
+  
+        const containerName = reportId.toLowerCase()
+        const blobName = containerName+"_"+"additional"+"_"+alphanumeric(7)
+        const containerClient = await azureStorage.getExistingContainer(containerName)
+        await azureStorage.uploadBlob(req.file,containerName,blobName,containerClient)
+        const saveDocResult = await reportDao.saveDocument(req.user.userId,reportId,"additional",blobName,req.file.originalname,6) 
+        if(saveDocResult.getStatusCode() !== 200){
+            return res.json(( new Response(500,"FAILURE",`Error in saving additional Document.`,"")).getErrorObject())
+        }   
+        
+        console.log("Container name : " + containerName + " and blob Name is : " + blobName)
+        
+        return res.json((new Response(200,"SUCCESS",`Additional document added successfully for reportId ${reportId}.`,saveDocResult.getData()))
+        .getSuccessObject())
+    }catch(error){
+        fs.unlink(req.file.path,(err)=>{
+            if(err){
+                console.error("Error in deleting files from local " + err)
+                return
+            }
+            console.log("Files deleted from local successfully.")
+        })
+        console.error("Error adding new Document to the report " + error)
+        return res.json(( new Response(500,"FAILURE",`Unknown error occured.`,"")).getErrorObject())
+    }
+}
+
 async function getAllReportReviewStandards(res){
     const response = await reportDao.getAllReportReviewStandards()
     createResponse(response,res)
@@ -403,7 +455,8 @@ function createResponse(response,res){
 } 
 
 module.exports = {saveReport,getReportsWithStatusCount,deleteFilesFromLocal,downloadDocumentRelatedToReport,
-                 updateDocument,deleteDocument,getAllInformationByReportId,updateReportInfo,getAllReportReviewStandards}
+                 updateDocument,deleteDocument,getAllInformationByReportId,updateReportInfo,getAllReportReviewStandards,
+                 addAdditionalDocuments}
 
 
 

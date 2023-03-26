@@ -162,6 +162,9 @@ async function getNotifications(req,res){
 }
 
 async function getAllProjectsForAnEngineer(req,res){
+    if(!isEngineer(req)){
+        return reveiwerService.getAllProjectsOfReviwer(req,res)
+    }
     const response = await projectDao.getAllProjects(req.user.userId)
     return createResponse(response,res)
 }

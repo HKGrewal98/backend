@@ -46,6 +46,11 @@ async function registerReviewerComment(req,res){
     const {report_id,comment} = req.body
 }
 
+async function getAllProjectsOfReviwer(req,res){
+    const response  = await reviewerDao.getAllProjectsLinkedToReviewer(req.user.userId)
+    return createResponse(response,res)
+}
+
 function isReviewer(req){
     return req.user.is_reviewer
 }
@@ -58,4 +63,4 @@ function createResponse(response,res){
 } 
 
 module.exports = {getReveiwerProjectsByName,searchForReveiwer,getReviwerNotifications,getReveiwerWorkStatus,
-                  recordDecision,registerReviewerComment}
+                  recordDecision,registerReviewerComment,getAllProjectsOfReviwer}

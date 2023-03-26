@@ -198,6 +198,26 @@ async function getReveiwerWorkStatus(userId,req){
 
 }
 
+async  function getAllProjectsLinkedToReviewer(userId){
+    
+    try{
+        let query = ` select distinct(p.project_number),p.project_name from project_info p inner join  report r on r.project_number = p.project_number 
+        where r.reviewer_id=?`
+
+        const result = await sequelize.query(query,{
+              replacements:[userId],
+              raw:true,
+              type:QueryTypes.SELECT
+        })
+
+        return new Response(200,"SUCCESS",`Projects of Reviewer with id ${userId}.`,result)
+
+    }catch(error){
+        console.error("Error in fetching reviewer projects " + error)
+        return new Response(500,"FAILURE",`Unknown error occured.`,null)
+    }
+}
+
 function getLimitAndOffset(req){
 
     let {limit,offset} = req.query
@@ -217,4 +237,5 @@ function getLimitAndOffset(req){
 }
 
 
-module.exports = {getReveiwerProjectsByName,searchForReveiwer,getReviwerNotifications,getReveiwerWorkStatus}
+module.exports = {getReveiwerProjectsByName,searchForReveiwer,getReviwerNotifications,getReveiwerWorkStatus,
+                  getAllProjectsLinkedToReviewer}
