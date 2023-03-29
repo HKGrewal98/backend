@@ -35,3 +35,9 @@
 .table>thead{
     margin-left: 250px;
 }
+
+.tableColumnsSize{
+    min-width: "125px";
+    max-width:"130px" ;
+    word-wrap:"break-word"
+}

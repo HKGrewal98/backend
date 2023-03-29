@@ -7,12 +7,12 @@ import { NavLink, useFetcher, useNavigate } from "react-router-dom";
 import { LoginDetails } from "../../Login/LoginReducer/LoginSlice";
 import "./ViewReportScreen.css";
 import Cookies from "universal-cookie";
-import { DeliverablesDetails } from "../AssignedProjects/AssignedProjectsReducer/Deliverables";
+import { DeliverablesDetails } from "../EngineerMain/EngineerReducers/Deliverables";
 import BACKEND_URL from "../../../backendUrl";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import { LoaderStatus } from "../../Common/LoaderReducer/LoaderSlice";
-import { ProjectNumber } from "../AssignedProjects/AssignedProjectsReducer/ProjectNumber";
+import { ProjectNumber } from "../EngineerMain/EngineerReducers/ProjectNumber";
 import { height } from "@mui/system";
 import { ReviewerApproveSvg } from "../../Icons/ReviewerApproveSvg";
 import { ReviewerHoldSvgg } from "../../Icons/ReviewerHoldSvgg";
@@ -25,7 +25,7 @@ import { ApproveModal } from "../ReviewerMain/ApproveModal";
 import { HoldModal } from "../ReviewerMain/HoldModal";
 import { RejectModal } from "../ReviewerMain/RejectModal";
 import { EditReportChildContent } from "./EditReportChildContent";
-import { Reports } from "../AssignedProjects/AssignedProjectsReducer/ReportDetails";
+import { Reports } from "../EngineerMain/EngineerReducers/ReportDetails";
 
 const EditReportScreen = () => {
   const {
@@ -33,12 +33,14 @@ const EditReportScreen = () => {
     handleSubmit,
     control,
     formState: { errors },
+    setError
   } = useForm();
 
   const [showModalApprove, setShowModalApprove] = useState(false);
   const [showModalReject, setShowModalReject] = useState(false);
   const [showModalHold, setShowModalHold] = useState(false);
   const [showModalUpdateDoc, setShowModalUpdateDoc] = useState(false);
+  const [showModalAdditionalDoc, setShowModalAdditionalDoc] = useState(false);
   const [showModalDeleteDoc, setShowModalDeleteDoc] = useState(false);
   const [reportDataForModal, setReportDataForModal] = useState()
       const [showGreen, setShowGreen] = useState(false);
@@ -55,15 +57,39 @@ const EditReportScreen = () => {
   const navigate = useNavigate();
 
   const onSubmit = (data) => {
-    dispatch(LoaderStatus(true));
     let sub_type = reportDataForModal?.sub_type;
     // console.log("Data", data, "Sub_type", reportDataForModal)
+    let f = data?.file[0]?.name
+    let fileSize = data?.file[0]?.size
+    // console.log(fileSize,"fileSize")
+    if(fileSize>250000000){
+      setError("file", {
+        type: "filetype",
+        message: "Size less than 25Mb is allowed"
+    });
+    return
+    }
+    const getFExtansion =  f.includes('.') && f.substr(f.lastIndexOf('.') + 1).split(' ')[0]
+    // console.log("extension check", getFExtansion)
+    if((getFExtansion!=="xlsx") && (getFExtansion!=="xls")  && (getFExtansion!=="xlsm")  && (getFExtansion!=="xlsb")  && (getFExtansion!=="doc")  && (getFExtansion!=="docx")){
+
+    setError("file", {
+        type: "filetype",
+        message: "Only Doc, Docx, Xls, Xlsx,Xlsm,Xlsb documents are valid."
+    });
+    return;
+
+    }
+    dispatch(LoaderStatus(true));
+
     let formData = new FormData();
     formData.append("file", data.file[0]);
-    formData.append("doc_id", reportDataForModal?.file_id);
-    formData.append("sub_type", sub_type);
+   
     // console.log("file", formData)
-    axios({
+    if(sub_type){
+       formData.append("doc_id", reportDataForModal?.file_id);
+    formData.append("sub_type", sub_type);
+       axios({
       method: "put",
       maxBodyLength: Infinity,
       url: `${BACKEND_URL}/report/upload`,
@@ -93,6 +119,41 @@ const EditReportScreen = () => {
           navigate("/");
         }
       });
+    }
+    else{
+      formData.append("reportId",ReportsDetailsRedux?.report?.report_number )
+       axios({
+      method: "post",
+      maxBodyLength: Infinity,
+      url: `${BACKEND_URL}/report/additional/doc`,
+      headers: myHeaders,
+      credentials: "include",
+      withCredentials: true,
+      data: formData,
+    })
+      .then(function (response) {
+        //  console.log("Response From update doc",response.data)
+        if (response?.data?.statusCode === 200) {
+          setShowModalAdditionalDoc(false);
+          dispatch(LoaderStatus(true));
+          getReportById(ReportsDetailsRedux?.report?.report_number);
+        }
+        //  getFinancialsData()
+      })
+      .catch(function (error) {
+        console.log("Error block update report", error);
+        if (error?.response?.status === 401) {
+          dispatch(LoginDetails({}));
+          cookies.remove("connect.sid");
+          localStorage.setItem(
+            "AlertMessage",
+            JSON.stringify("Session Expired...Please Login Again")
+          );
+          navigate("/");
+        }
+      });
+    }
+   
   };
   function hideModalApprove(bool){
     setShowModalApprove(bool)
@@ -112,7 +173,7 @@ const EditReportScreen = () => {
     }
   },[])
   const getReportById = (report_number)=>{
-    // console.log("URL",  `${BACKEND_URL}/report/${report_number}`)
+    // console.log("Runuung", report_number)
     axios({
       method: "get",
       maxBodyLength: Infinity,
@@ -204,6 +265,9 @@ const EditReportScreen = () => {
                   {...register("file", { required: true })}
                   placeholder="Upload"
                 />
+                  {errors.file && (
+            <div style={{ color: "red" }}> {errors.file?.message}</div>
+          )}
               </div>
               <div class="custom-modal-footer d-flex justify-content-end ">
                 <button
@@ -216,6 +280,46 @@ const EditReportScreen = () => {
                   className="btn customDC-color m-2"
                   onClick={() => {
                     setShowModalUpdateDoc(false);
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : (
+        ""
+      )}
+        {showModalAdditionalDoc === true ? (
+        <>
+          <div id="myCustomModal" class="customModal">
+            <div class="custom-modal-content">
+              <div class="custom-modal-header customDC-color pt-2">
+                <h4 className="text-center ">Add New Document</h4>
+              </div>
+              <div class="custom-modal-body">
+                <input
+                  className=""
+                  type="file"
+                  {...register("file", { required: true })}
+                  placeholder="Upload"
+                />
+                 {errors.file && (
+            <div style={{ color: "red" }}> {errors.file?.message}</div>
+          )}
+              </div>
+              <div class="custom-modal-footer d-flex justify-content-end ">
+                <button
+                  className="btn customDC-color m-2"
+                  onClick={handleSubmit(onSubmit)}
+                >
+                  Add Document
+                </button>
+                <button
+                  className="btn customDC-color m-2"
+                  onClick={() => {
+                    setShowModalAdditionalDoc(false);
                   }}
                 >
                   Close
@@ -300,6 +404,7 @@ const EditReportScreen = () => {
       ) : (
         ""
       )}
+      
       <div>
         <div className="ReviewReports py-2">
           <NavLink className="leftHBar" to="">
@@ -348,14 +453,17 @@ const EditReportScreen = () => {
 
         {ReportsDetailsRedux?.report ? (
           <>
-           <EditReportChildContent />
+           <EditReportChildContent getReportById={getReportById}/>
             <div className="DocumentsParents">
               <h4>
                 <b>DOCUMENTS</b>
               </h4>
-              {ULogged?.is_reviewer === true ? (
+              {ULogged?.is_engineer === true ? (
                 <>
-                  <button type="button" className="btn btn-dark" onClick={()=>{}}>
+                  <button type="button" className="btn btn-dark" onClick={()=>{
+                        setShowModalAdditionalDoc(true)
+                        setShowModalAdditionalDoc(true)
+                  }}>
                     ADD REVIEW DOCUMENTS
                   </button>
                 </>
@@ -383,7 +491,7 @@ const EditReportScreen = () => {
                           <th scope="row">
                              {report?.original_file_name}
                             </th>
-                            <td>{ReportsDetailsRedux?.report?.models}</td>
+                            <td>{ReportsDetailsRedux?.report?.['project_number_fk.modals']}</td>
                   {ReportsDetailsRedux?.report?.report_status ===
                   "SENT TO REVIEWER" || ReportsDetailsRedux?.report?.status_type ===
                   "SENT TO REVIEWER" ? (

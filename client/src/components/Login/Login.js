@@ -21,7 +21,7 @@ export const Login = () => {
   let navigate = useNavigate()
   const cookies = new Cookies()
   
-  const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  const { register, handleSubmit, watch, formState: { errors }, reset } = useForm();
   const [showGreen, setShowGreen] = useState(false);
   const [showRed, setShowRed] = useState(false)
   const [alertValue, setAlertValue] = useState()
@@ -57,7 +57,7 @@ export const Login = () => {
         // console.log(res.headers)
         // console.log(res.config)
         localStorage.clear()
-      console.log("res check:",res)
+      // console.log("res check:",res)
       if(res?.data?.data?.isLoggedIn){
 
         dispatch(LoginDetails(res.data?.data))
@@ -71,6 +71,7 @@ export const Login = () => {
         if(err?.response?.status == 401){
           setAlertValue("Invalid UserId or Password")
           setShowRed(true)
+          reset()
       
         }
         })

@@ -40,7 +40,7 @@ export const MyNotificationsBox = () => {
     <div className="myContainer">
         <div className="customHeader py-3 px-5 ">
           <div style={{fontSize:"15px",fontWeight:"Bold"}}>My Notifications</div>
-          <div><a href="#">View All</a></div>
+          {/* <div><a href="#">View All</a></div> */}
         </div>
         <div className="customBody">
           <div className="customItems flex-column">
@@ -49,7 +49,7 @@ export const MyNotificationsBox = () => {
               return(<div className='d-flex justify-content-between align-items-center' key={data?.report_number}>
                 <div>Review <b>{data?.report_status}</b> - {data?.report_name}</div>
             <div className="custominfo">
-              <div className=''><a href='#'>updates@dc.i</a></div>
+              <div className=''><span style={{color:"blue"}}>updates@dc.i</span></div>
               <div className=''>{data?.report_created_at}</div>
             </div>
             </div>  )

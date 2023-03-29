@@ -6,7 +6,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {ProjectNumber} from "../AssignedProjects/AssignedProjectsReducer/ProjectNumber";
+import {ProjectNumber} from "../EngineerMain/EngineerReducers/ProjectNumber";
 import BACKEND_URL from "../../../backendUrl";
 
 export const AssignedProjectsBox = () => {
@@ -24,6 +24,9 @@ export const AssignedProjectsBox = () => {
     formState: { errors },
   } = useForm();
   const onSubmit = (data) => {
+    Object.keys(data).forEach(key => {
+      data[key] = data[key].trim()
+    })
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append('Access-Control-Allow-Origin', 'http://localhost:8081')
@@ -79,7 +82,7 @@ export const AssignedProjectsBox = () => {
             
             </div>
             )
-          }):"No results"}
+          }):"Please try with different criteria"}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
@@ -98,11 +101,9 @@ export const AssignedProjectsBox = () => {
             Assigned Projects
           </div>
           <div>
-            {ULogged?.is_engineer === true ? <>
+          
               <div className="btn text-primary pt-0" onClick={()=>navigate('/view/assignedProjects')}>View All</div>
-            </>:<>
-            <div className="btn text-primary pt-0">View All</div>
-            </>}
+          
           
           </div>
         </div>

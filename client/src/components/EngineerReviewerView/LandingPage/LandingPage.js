@@ -44,6 +44,9 @@ export const LandingPage = () => {
  
   const onSubmit = (data) => {
     // console.log(data);
+    Object.keys(data).forEach(key => {
+      data[key] = data[key].trim()
+    })
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append('Access-Control-Allow-Origin', 'http://localhost:8081')
@@ -139,7 +142,7 @@ export const LandingPage = () => {
             
             </div>
             )
-          }):"No results"}
+          }):"Please try with different criteria"}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>

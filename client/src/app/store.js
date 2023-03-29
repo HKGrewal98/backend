@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
 import LoginReducer from '../components/Login/LoginReducer/LoginSlice'
-import DeliverablesReducer from '../components/EngineerReviewerView/AssignedProjects/AssignedProjectsReducer/Deliverables'
-import AllProjectsDetails from '../components/EngineerReviewerView/AssignedProjects/AssignedProjectsReducer/AllProjects'
+import DeliverablesReducer from '../components/EngineerReviewerView/EngineerMain/EngineerReducers/Deliverables'
+import AllProjectsDetails from '../components/EngineerReviewerView/EngineerMain/EngineerReducers/AllProjects'
 import LoaderSliceReducer from '../components/Common/LoaderReducer/LoaderSlice'
-import ProjectNumber from '../components/EngineerReviewerView/AssignedProjects/AssignedProjectsReducer/ProjectNumber'
-import ReportDetails from '../components/EngineerReviewerView/AssignedProjects/AssignedProjectsReducer/ReportDetails'
+import ProjectNumber from '../components/EngineerReviewerView/EngineerMain/EngineerReducers/ProjectNumber'
+import ReportDetails from '../components/EngineerReviewerView/EngineerMain/EngineerReducers/ReportDetails'
 import ReviewerAllReportsSlice from '../components/EngineerReviewerView/ReviewerMain/ReviewerReducers/ReviewerAllReportsSlice'
 
 

@@ -7,7 +7,7 @@ import "./ViewReportScreen.css"
 import Cookies from "universal-cookie";
 import { LoaderStatus } from '../../Common/LoaderReducer/LoaderSlice';
 import BACKEND_URL from '../../../backendUrl';
-import { Reports } from '../AssignedProjects/AssignedProjectsReducer/ReportDetails';
+import { Reports } from '../EngineerMain/EngineerReducers/ReportDetails';
 import { DownloadSvg } from '../../Icons/DownloadSvg';
 
 const ViewReportsScreen = () => {
@@ -167,8 +167,34 @@ const ViewReportsScreen = () => {
 
         </div>
 
-<div className='Reportsstandards'>
-<section>Report Standards</section>    
+<div className='Reportsstandards' style={{maxWidth:"600px" , maxHeight:"350px", overflow:"auto"}}>
+<section>Report Standards</section> 
+<table class="table" style={{margin:"0", backgroundColor:"white", borderBottom:"0",width:"600px",marginTop: "0"}}>
+  <thead>
+    <tr>
+      <th scope="col" >Type</th>
+      <th scope="col">Standard</th>
+      <th scope="col">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {ReportsDetailsRedux?.standards?.length>0 ? 
+    <>
+      {ReportsDetailsRedux?.standards.map((standard)=>{
+        return(
+          <tr key={standard?.id} style={{backgroundColor:"white"}}>
+          <th >{standard?.standard_type}</th>
+          <td>{standard?.standard}</td>
+          <td>{standard?.description}</td>
+        </tr>
+        )
+      })}
+    </>
+    :""}
+   
+   
+  </tbody>
+</table>   
 </div>
 
         </div>

@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { LoaderStatus } from '../../../Common/LoaderReducer/LoaderSlice';
 import { LoginDetails } from '../../../Login/LoginReducer/LoginSlice';
-import { DeliverablesDetails } from '../AssignedProjectsReducer/Deliverables';
+import { DeliverablesDetails } from '../EngineerReducers/Deliverables';
 import Cookies from 'universal-cookie'
-import { ProjectNumber } from '../AssignedProjectsReducer/ProjectNumber';
+import { ProjectNumber } from '../EngineerReducers/ProjectNumber';
 import BACKEND_URL from '../../../../backendUrl';
 
 export const Details = () => {
@@ -56,7 +56,8 @@ export const Details = () => {
               localStorage.setItem("PrevProjectNumber", JSON.stringify(response?.data?.data?.project?.project_number))
               dispatch(LoaderStatus(false))
             }
-            else{console.log("no projects yet")
+            else{
+              // console.log("no projects yet")
             dispatch(LoaderStatus(false))
           }
             

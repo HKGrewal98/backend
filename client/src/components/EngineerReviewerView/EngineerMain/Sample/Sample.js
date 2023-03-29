@@ -4,16 +4,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { LoaderStatus } from "../../../Common/LoaderReducer/LoaderSlice";
 import { LoginDetails } from "../../../Login/LoginReducer/LoginSlice";
-import { DeliverablesDetails } from "../AssignedProjectsReducer/Deliverables";
+import { DeliverablesDetails } from "../EngineerReducers/Deliverables";
 import Cookies from "universal-cookie";
-import { Reports } from "../AssignedProjectsReducer/ReportDetails";
-import { ProjectNumber } from "../AssignedProjectsReducer/ProjectNumber";
+import { Reports } from "../EngineerReducers/ReportDetails";
+import { ProjectNumber } from "../EngineerReducers/ProjectNumber";
 import BACKEND_URL from "../../../../backendUrl";
-
-export const Financials = () => {
+export const Sample = () => {
   const cookies = new Cookies();
 
-  const FinancialsData = useSelector((state) => state.Deliverables.value);
+  const SamplesData = useSelector((state) => state.Deliverables.value);
   const ProjectNumberRedux = useSelector((state) => state.ProjectNumberDetails.value.project_number);
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
@@ -23,28 +22,45 @@ export const Financials = () => {
   const [tempReport, setTempReport] = useState()
 
   const [arrayPageState, setArrayPageState] = useState(1);
+  const [showNextButton, setShowNextButton] = useState(true)
+  const [showPrevButton, setShowPrevButton] = useState(true)
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [offset, setOffset] = useState(0)
+
+
   const nextPage = () => {
-    let max = Math.ceil(FinancialsData?.reports?.length / 4);
-    // console.log("Max", max)
-    if (arrayPageState < max) {
-      setArrayPageState(arrayPageState + 1);
+    
+    if(SamplesData?.reports.length >=8){
+      // console.log("inside nextpage function")
+      let newOffset = offset+8
+      setOffset(newOffset)
+      getSamplesData(newOffset)
     }
-  };
-  const prevPage = () => {
-    if (arrayPageState > 1) {
-      setArrayPageState(arrayPageState - 1);
-    }
-  };
+  
+    };
+    const prevPage = () => {
+      // console.log("inside prevpage function")
+
+     if(offset>=8){
+      let newOffset = offset-8
+      setOffset(newOffset)
+      getSamplesData(newOffset)
+  
+     }
+    };
+  
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
   myHeaders.append("Access-Control-Allow-Origin", "http://localhost:8081");
   myHeaders.append("Access-Control-Allow-Credentials", true);
+ 
 
-  const getFinancialsData =()=>{
+  const getSamplesData =(newOffset)=>{
+  // console.log("newoffset check before sending", newOffset)
+
     
     if(ProjectNumberRedux !== undefined){
       
@@ -60,13 +76,30 @@ export const Financials = () => {
         headers: myHeaders,
         credentials: "include",
         withCredentials: true,
-        params: {
-          screenId: 2,
+         params: {
+          "offset": newOffset || 0,
+          "limit":  8,
+          "screenId": 5
         },
       })
         .then(function (response) {
-          // console.log("Response in deliverables",response.data);
+          // console.log("Response in samples",response.data);
+          let tempOffset
+          if(newOffset!= undefined){
+            tempOffset = newOffset
+          }
+          else{
+            tempOffset = offset
+          }
           if (response?.data?.data?.project) {
+            if(response.data.data?.reports.length<8 && tempOffset==0){
+              setShowNextButton(false)
+              setShowPrevButton(false)
+            }
+            else{
+              setShowNextButton(true)
+              setShowPrevButton(true)
+            }
             dispatch(DeliverablesDetails(response?.data?.data));
             // setDeliverablesDataState(response?.data?.data?.reports);
             localStorage.setItem("PrevProjectNumber", JSON.stringify(response?.data?.data?.project?.project_number))
@@ -94,22 +127,21 @@ export const Financials = () => {
   }
   useEffect(()=>{
     let prevProjectNumber = JSON.parse(localStorage.getItem("PrevProjectNumber"))
-    if(prevProjectNumber != ProjectNumberRedux ||  !FinancialsData?.project){
-    getFinancialsData()
+    if(prevProjectNumber != ProjectNumberRedux ||  !SamplesData?.project){
+    getSamplesData()
     }
   },[ProjectNumberRedux])
 
   useEffect(() => {
+    setOffset(0)
     let SelectedProject = JSON.parse(localStorage.getItem("SelectedProject"))
 
-    if (!FinancialsData?.project) {
-      getFinancialsData()
-    }
-    if(!FinancialsData?.project?.project_name && SelectedProject != undefined){
+    if(SelectedProject != undefined){
       dispatch(ProjectNumber(SelectedProject))
-      getFinancialsData() 
 
     }
+    getSamplesData() 
+
   }, []);
   return (
     <div>
@@ -141,7 +173,7 @@ export const Financials = () => {
           // console.log("Response From Delete in equipment log",response.data)  
           if(response?.data?.statusCode === 200){
           setShowModalDeleteDoc(false)
-          getFinancialsData() 
+          getSamplesData() 
           }
         
         })
@@ -174,49 +206,48 @@ export const Financials = () => {
         <table className="table customTableMArgin">
           <thead>
             <tr>
-              <th scope="col" style={{ minWidth: "125px" }}>
+              <th scope="col" className="tableColumnsSize">
                 Date created
               </th>
-              <th scope="col" style={{ minWidth: "125px" }}>
+              <th scope="col" className="tableColumnsSize">
                 Record Name
               </th>
-              <th scope="col" style={{ minWidth: "125px" }}>
+              <th scope="col" className="tableColumnsSize">
                 Record Type
               </th>
-              <th scope="col" style={{ minWidth: "125px" }}>
+              <th scope="col" className="tableColumnsSize">
                 Project Number
               </th>
-              <th scope="col" style={{ minWidth: "125px" }}>
+              <th scope="col" className="tableColumnsSize">
                 Project Name
               </th>
-              <th scope="col" style={{ minWidth: "125px" }}>
+              <th scope="col" className="tableColumnsSize">
                 Description
               </th>
-              <th scope="col" style={{ minWidth: "125px" }}>
+              <th scope="col" className="tableColumnsSize">
                 Responsibility
               </th>
-              <th scope="col" style={{ minWidth: "125px" }}>
+              <th scope="col" className="tableColumnsSize">
                 Work Order
               </th>
               <th scope="col" style={{minWidth:"140px"}}></th>
             </tr>
           </thead>
           <tbody>
-            {FinancialsData?.project && FinancialsData?.reports?.length > 0 ? (
+            {SamplesData?.project && SamplesData?.reports?.length > 0 ? (
               <>
-                {FinancialsData.reports
-                  .slice((arrayPageState - 1) * 4, arrayPageState * 4)
+                {SamplesData.reports
                   .map((data) => {
                     return (
                       <tr key={data?.file_id}>
-                        <th><b>{data?.report_created_at.slice(0, 10)}</b></th>
-                        <td>{data?.original_file_name}</td>
-                        <td>{data?.file_type}</td>
-                        <td>{FinancialsData?.project?.project_number}</td>
-                        <td>{FinancialsData.project?.project_name}</td>
-                        <td>{FinancialsData?.project?.description}</td>
-                        <td>{data?.reviewer_id}</td>
-                        <td>{data?.report_comments}</td>
+                        <th className="tableColumnsSize"><b>{data?.report_created_at.slice(0, 10)}</b></th>
+                        <td className="tableColumnsSize">{data?.original_file_name}</td>
+                        <td className="tableColumnsSize">{data?.file_sub_type}</td>
+                        <td className="tableColumnsSize">{SamplesData?.project?.project_number}</td>
+                        <td className="tableColumnsSize">{SamplesData.project?.project_name}</td>
+                        <td className="tableColumnsSize">{SamplesData?.project?.description}</td>
+                        <td className="tableColumnsSize">{data?.reviewer_id}</td>
+                        <td className="tableColumnsSize">{data?.report_comments}</td>
 
                         <td>
                           <svg
@@ -229,7 +260,7 @@ export const Financials = () => {
                             style={{ cursor: "pointer" }}
                             onClick={() => {
                               window.open(
-                                `http://localhost:8081/report/download/${data?.file_id}`
+                                `${BACKEND_URL}/report/download/${data?.file_id}`
                               );
                             }}
                           >
@@ -267,7 +298,7 @@ export const Financials = () => {
                             onClick={() => 
                               {
                                 localStorage.setItem("ReportNumber",JSON.stringify(data?.report_number))
-                                dispatch(Reports({"report":data,"project":FinancialsData.project}))
+                                dispatch(Reports({"report":data,"project":SamplesData.project}))
                                 navigate("/view/editReport")}}
                           >
                             <g clipPath="url(#clip0_106_9042)">
@@ -356,7 +387,7 @@ export const Financials = () => {
                             style={{ cursor: "pointer" }}
                             onClick={() => {
                               localStorage.setItem("ReportNumber",JSON.stringify(data?.report_number))
-                              dispatch(Reports({"report":data,"project":FinancialsData.project}))
+                              dispatch(Reports({"report":data,"project":SamplesData.project}))
                               navigate("/view/viewReport")}}
                           >
                             <path
@@ -391,19 +422,19 @@ export const Financials = () => {
             )}
           </tbody>
         </table>
-        {FinancialsData?.reports?.length > 4 ? (
-          <div className="d-flex justify-content-center">
+       
+        <div className="d-flex justify-content-center">
+          {showNextButton === true ? <>
             <button className="btn customDC-color m-2" onClick={prevPage}>
-              Previous Page
-            </button>
-            <button className="btn customDC-color m-2" onClick={nextPage}>
-              Next Page
-            </button>
-          </div>
-        ) : (
-          ""
-        )}
+            Previous Page
+          </button></>:""}
+        {showPrevButton=== true ? <>
+          <button className="btn customDC-color m-2" onClick={nextPage}>
+            Next Page
+          </button></>:""}
+         
+        </div>
       </div>
     </div>
   );
-};
+}

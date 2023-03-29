@@ -2,7 +2,7 @@ import React from "react";
 import "./EquipmentLog.css";
 
 import { LoaderStatus } from "../../../Common/LoaderReducer/LoaderSlice";
-import { DeliverablesDetails } from "../AssignedProjectsReducer/Deliverables";
+import { DeliverablesDetails } from "../EngineerReducers/Deliverables";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -10,8 +10,8 @@ import { useEffect } from "react";
 import { LoginDetails } from "../../../Login/LoginReducer/LoginSlice";
 import Cookies from 'universal-cookie'
 import { useState } from "react";
-import { Reports } from "../AssignedProjectsReducer/ReportDetails";
-import { ProjectNumber } from "../AssignedProjectsReducer/ProjectNumber";
+import { Reports } from "../EngineerReducers/ReportDetails";
+import { ProjectNumber } from "../EngineerReducers/ProjectNumber";
 import BACKEND_URL from "../../../../backendUrl";
 export const EquipmentLog = () => {
   const dispatch = useDispatch();
@@ -24,29 +24,38 @@ export const EquipmentLog = () => {
   myHeaders.append("Access-Control-Allow-Credentials", true);
   const [showModalDeleteDoc, setShowModalDeleteDoc] = useState(false)
   const [tempReport, setTempReport] = useState()
-
+  const [showNextButton, setShowNextButton] = useState(true)
+  const [showPrevButton, setShowPrevButton] = useState(true)
   const cookies = new Cookies()
   const [arrayPageState, setArrayPageState] = useState(1)
+  const [offset, setOffset] = useState(0)
 
 
-  const nextPage = ()=>{
-    let max = Math.ceil(EquipmentLogData?.reports?.length/4)
-    // console.log("Max", max)
-    if(arrayPageState<max){
-
-      setArrayPageState(arrayPageState+1)
+  const nextPage = () => {
+    
+    if(EquipmentLogData?.reports.length >=8){
+      // console.log("inside nextpage function")
+      let newOffset = offset+8
+      setOffset(newOffset)
+      getEquipmentlog(newOffset)
     }
-  }
-  const prevPage = ()=>{
-    if(arrayPageState>1){
+  
+    };
+    const prevPage = () => {
+      // console.log("inside prevpage function")
 
-      setArrayPageState(arrayPageState-1)
-    }
-  }
-
+     if(offset>=8){
+      let newOffset = offset-8
+      setOffset(newOffset)
+      getEquipmentlog(newOffset)
+  
+     }
+    };
   
 
-  const getEquipmentlog = ()=>{
+  const getEquipmentlog = (newOffset)=>{
+  // console.log("newoffset check before sending", newOffset)
+
     if(ProjectNumberRedux !== undefined){
       
     dispatch(LoaderStatus(true));
@@ -61,12 +70,29 @@ export const EquipmentLog = () => {
       credentials: "include",
       withCredentials: true,
       params: {
-        screenId: 4,
+        "offset": newOffset || 0,
+        "limit":  8,
+        "screenId": 4
       },
     })
       .then(function (response) {
         // console.log("Response in Equipment Log", response.data);
+        let tempOffset
+        if(newOffset!= undefined){
+          tempOffset = newOffset
+        }
+        else{
+          tempOffset = offset
+        }
         if (response?.data?.data?.project) {
+          if(response.data.data?.reports.length<8 && tempOffset==0){
+            setShowNextButton(false)
+            setShowPrevButton(false)
+          }
+          else{
+            setShowNextButton(true)
+            setShowPrevButton(true)
+          }
           dispatch(DeliverablesDetails(response?.data?.data));
           localStorage.setItem("PrevProjectNumber", JSON.stringify(response?.data?.data?.project?.project_number))
           dispatch(LoaderStatus(false));
@@ -97,16 +123,17 @@ export const EquipmentLog = () => {
     }
   },[ProjectNumberRedux])
   useEffect(() => {
+    setOffset(0)
     let SelectedProject = JSON.parse(localStorage.getItem("SelectedProject"))
 
-    if(!EquipmentLogData?.project){
-      getEquipmentlog()
-    }
-    if(!EquipmentLogData?.project?.project_name && SelectedProject != undefined){
+ 
+    if(SelectedProject != undefined){
       dispatch(ProjectNumber(SelectedProject))
-      getEquipmentlog() 
 
     }
+    getEquipmentlog() 
+
+   
   }, []);
 
   return (
@@ -171,14 +198,14 @@ export const EquipmentLog = () => {
       <table className="table customTableMArgin" >
         <thead>
           <tr>
-            <th scope="col" style={{minWidth:"110px"}}>Date created</th>
-            <th scope="col" style={{minWidth:"110px"}}>Record Name</th>
-            <th scope="col" style={{minWidth:"110px"}}>Record Type</th>
-            <th scope="col" style={{minWidth:"110px"}}>Project Number</th>
-            <th scope="col" style={{minWidth:"110px"}}>Project Name</th>
-            <th scope="col" style={{minWidth:"110px"}}>Description</th>
-            <th scope="col" style={{minWidth:"110px"}}>Responsibility</th>
-            <th scope="col" style={{minWidth:"110px"}}>Work Order</th>
+            <th scope="col" className="tableColumnsSize ">Date created</th>
+            <th scope="col" className="tableColumnsSize ">Record Name</th>
+            <th scope="col" className="tableColumnsSize ">Record Type</th>
+            <th scope="col" className="tableColumnsSize ">Project Number</th>
+            <th scope="col" className="tableColumnsSize ">Project Name</th>
+            <th scope="col" className="tableColumnsSize ">Description</th>
+            <th scope="col" className="tableColumnsSize ">Responsibility</th>
+            <th scope="col" className="tableColumnsSize ">Work Order</th>
             <th scope="col" width="140px"></th>
           </tr>
         </thead>
@@ -186,17 +213,17 @@ export const EquipmentLog = () => {
         <tbody>
           {EquipmentLogData?.project && EquipmentLogData.reports?.length > 0 ? (
             <>
-              {EquipmentLogData?.reports.slice((arrayPageState-1)*4,arrayPageState* 4).map((data) => {
+              {EquipmentLogData?.reports.map((data) => {
                 return (
                   <tr key={data?.file_id}>
-                    <th><b>{data?.report_created_at.slice(0,10)}</b></th>
-                    <td>{data?.original_file_name}</td>
-                    <td>{data?.file_sub_type}</td>
-                    <td>{EquipmentLogData?.project?.project_number}</td>
-                    <td>{EquipmentLogData?.project?.project_name}</td>
-                    <td>{EquipmentLogData?.project?.description}</td>
-                    <td>{data?.reviewer_id}</td>
-                    <td>{data?.tags}</td>
+                    <th className="tableColumnsSize"><b>{data?.report_created_at.slice(0,10)}</b></th>
+                    <td className="tableColumnsSize">{data?.original_file_name}</td>
+                    <td className="tableColumnsSize">{data?.file_sub_type}</td>
+                    <td className="tableColumnsSize">{EquipmentLogData?.project?.project_number}</td>
+                    <td className="tableColumnsSize">{EquipmentLogData?.project?.project_name}</td>
+                    <td className="tableColumnsSize">{EquipmentLogData?.project?.description}</td>
+                    <td className="tableColumnsSize">{data?.reviewer_id}</td>
+                    <td className="tableColumnsSize">{data?.tags}</td>
                     
                     <td>
                       <svg
@@ -209,7 +236,7 @@ export const EquipmentLog = () => {
                        style={{cursor:"pointer"}} 
                        onClick={()=>{
                         window.open(
-                          `http://localhost:8081/report/download/${data?.file_id}`
+                          `${BACKEND_URL}/report/download/${data?.file_id}`
                         )
                     }}
                        >
@@ -371,10 +398,17 @@ export const EquipmentLog = () => {
           )}
         </tbody>
       </table>
-      {EquipmentLogData?.reports?.length>4 ? <div className='d-flex justify-content-center'>
-      <button className='btn customDC-color m-2' onClick={prevPage}>Previous Page</button>
-      <button className='btn customDC-color m-2' onClick={nextPage}>Next Page</button>
-      </div>:""}  
+      <div className="d-flex justify-content-center">
+          {showNextButton === true ? <>
+            <button className="btn customDC-color m-2" onClick={prevPage}>
+            Previous Page
+          </button></>:""}
+        {showPrevButton=== true ? <>
+          <button className="btn customDC-color m-2" onClick={nextPage}>
+            Next Page
+          </button></>:""}
+         
+        </div>
     </div>
   );
 };

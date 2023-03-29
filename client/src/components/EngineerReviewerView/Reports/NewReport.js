@@ -14,69 +14,25 @@ import { LoginDetails } from '../../Login/LoginReducer/LoginSlice';
 import Cookies from "universal-cookie"
 import debounce from 'debounce'
 import BACKEND_URL from '../../../backendUrl';
-
+import { ProjectNumber } from '../EngineerMain/EngineerReducers/ProjectNumber';
+import {InfoSvg} from '../../Icons/InfoSvg'
+import moment from 'moment/moment';
 
 export const NewReport=()=>{
 
-  const list ={
-    ASSIGNED: ["Electrical Safety Standards","To help verify the functionality and safety of medical devices, electrical safety standards have been established in the United States, European countries, and other parts of the world.",
-    "Medical Device Testing","The standard outlines a process for medical devicemanufacturers to identify hazards, evaluates the risks associated with them, and implement risk controls.",
-    "Battery Testing Standards","Standards ensure interoperability and compatibility between the many elements of battery system.",
-    "Environmental and Reliability Testing","Electrical Environmental tests, as part of reliability testing, are important for confirmation of tolerances of electronic devices and components to enviromental stress and are most effective means of finding design and manufacturing problems"],
-    ADD_LAB_STANDARDS:  ["2Electrical Safety Standards","To help verify the functionality and safety of medical devices, electrical safety standards have been established in the United States, European countries, and other parts of the world.",
-    "Medical Device Testing","The standard outlines a process for medical devicemanufacturers to identify hazards, evaluates the risks associated with them, and implement risk controls.",
-    "Battery Testing Standards","Standards ensure interoperability and compatibility between the many elements of battery system.",
-    "Environmental and Reliability Testing","Electrical Environmental tests, as part of reliability testing, are important for confirmation of tolerances of electronic devices and components to enviromental stress and are most effective means of finding design and manufacturing problems"],
-    ADD_GLOBAL_STANDARDS:  ["3Electrical Safety Standards","To help verify the functionality and safety of medical devices, electrical safety standards have been established in the United States, European countries, and other parts of the world.",
-    "Medical Device Testing","The standard outlines a process for medical devicemanufacturers to identify hazards, evaluates the risks associated with them, and implement risk controls.",
-    "Battery Testing Standards","Standards ensure interoperability and compatibility between the many elements of battery system.",
-    "Environmental and Reliability Testing","Electrical Environmental tests, as part of reliability testing, are important for confirmation of tolerances of electronic devices and components to enviromental stress and are most effective means of finding design and manufacturing problems"]
-  }
-
+ 
   const [name,setName] = useState("")
-  const [data,setdata] = useState(list["ASSIGNED"])
+  const [ProjectCreatedData, setProjectCreatedData] = useState()
+
+  
   const [close,setClose] = useState(false)
   const [count,setCount] = useState(0)
 
-  const dataHandler=(name, e)=>{
-    // console.log(name)
-    if(list.hasOwnProperty(name)){
-      setName(name)
-      setdata(list[name])
 
-    }
-  }
-
-  function message(){
-    
-    if(count>0)
-    {
-      // alert("Standards Submitted successfully!")
-    }
-    else{
-      // alert("please select standards!")
-    }
-  }
-  function countHandler(e){
-    // console.log(count)
-    if(e.target.checked){
-      setCount((prev)=>prev+1)
-      setClose(true)
-    }
-    else{
-      const prev=count
-      setCount((prev)=>prev-1)
-      if(prev-1===0){
-        setClose(false)
-      }
-      else{
-        setClose(true)
-      }
-    }
-  }
   const [standards , setStandards] = useState([])
-
-  const { register, handleSubmit, control , formState: { errors }} = useForm();
+  const [slicedStandards, setSlicedStandards] = useState([])
+  const [activeStandard, setActiveStandard] = useState(1)
+  const { register, handleSubmit, control , formState: { errors } , reset, setError} = useForm();
   const[searchResults, setSearchResults] = useState([])
   const[searchResults1, setSearchResults1] = useState([])
   const[searchResults2, setSearchResults2] = useState([])
@@ -96,9 +52,88 @@ export const NewReport=()=>{
     { label: "CORRESPONDENTS", value: "12" },
    
   ];
+  var myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append('Access-Control-Allow-Origin', 'http://localhost:8081')
+  myHeaders.append('Access-Control-Allow-Credentials', true)
   
-  const onSubmit = ((data) => {
+ 
+    const filteredIds = (data)=>{
+      // console.log("Inside array function")
+      let IdsArr=[]
+      for (let id in data){
+        if(data[id] === true){
+          // console.log("ID true", id)
+          IdsArr.push(id)
+        }
+
+      }
+      return IdsArr
+    }
     
+  
+    const defaultValues = {
+      report_type: "",
+      certificate_type:""
+    };
+   
+
+
+  const onSubmit = ((data) => {
+  
+    let stID = filteredIds(data)
+    // console.log("Filtered ids", stID)
+  
+    let standardString = stID.toString()
+    // console.log(standardString)
+
+    // Report validation
+    let r = data?.report[0]?.name
+    let reportSize = data?.report[0]?.size
+    // console.log(certificateSize,"certificateSize")
+    if(reportSize>250000000){
+      setError("report", {
+        type: "filetype",
+        message: "Size less than 25Mb is allowed"
+    });
+    return
+    }
+    const getRExtansion =  r.includes('.') && r.substr(r.lastIndexOf('.') + 1).split(' ')[0]
+    // console.log("extension check", getRExtansion)
+    if((getRExtansion!=="xlsx") && (getRExtansion!=="xls")  && (getRExtansion!=="xlsm")  && (getRExtansion!=="xlsb")  && (getRExtansion!=="doc")  && (getRExtansion!=="docx")){
+
+    setError("report", {
+        type: "filetype",
+        message: "Only Doc, Docx, Xls, Xlsx,Xlsm,Xlsb documents are valid."
+    });
+    return;
+
+    }
+
+    // Certificate validation
+    let c = data?.certificate[0]?.name
+    let certificateSize = data?.certificate[0]?.size
+    // console.log(certificateSize,"certificateSize")
+    if(certificateSize>250000000){
+      setError("certificate", {
+        type: "filetype",
+        message: "Size less than 25Mb is allowed"
+    });
+    return
+    }
+    const getCExtansion =  r.includes('.') && c.substr(c.lastIndexOf('.') + 1).split(' ')[0]
+    // console.log("extension check", getCExtansion)
+    if((getCExtansion!=="xlsx") && (getCExtansion!=="xls")  && (getCExtansion!=="xlsm")  && (getCExtansion!=="xlsb")  && (getCExtansion!=="doc")  && (getCExtansion!=="docx")){
+
+    setError("certificate", {
+        type: "filetype",
+        message: "Only Doc, Docx, Xls, Xlsx,Xlsm,Xlsb documents are valid."
+    });
+    return;
+
+    }
+ 
+  
     let formData = new FormData()
     formData.append('issued_at', data.issued_at);
     formData.append('tags', data.tags);
@@ -108,25 +143,24 @@ export const NewReport=()=>{
     formData.append('receiving_customer', data.receiving_customer);
     formData.append('reviewer_id', data.reviewer_id);
     formData.append('project_number', data.project_number);;
-    formData.append('report_type', data.report_type.value);
-    formData.append('certificate_type', data.certificate_type.value);
+    formData.append('report_type', data.report_type?.value);
+    formData.append('certificate_type', data.certificate_type?.value);
     formData.append('report_name', data.report_name);
     formData.append('is_saved', 'true');
     formData.append("report",data.report[0])
     formData.append('hasReport', 'true');
     formData.append("certificate",data.certificate[0])
     formData.append('hasCertificate', 'true');
-    formData.append('standard1', data.standard1);
-    formData.append('standard2', data.standard2);
-    formData.append('standard3', data.standard3);
-    formData.append('standard4', data.standard4);
-    
-    // console.log("form data",data, formData)
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append('Access-Control-Allow-Origin', 'http://localhost:8081')
-    myHeaders.append('Access-Control-Allow-Credentials', true)
-    
+   
+    if(standardString?.length>0){
+      // console.log("If block", standardString.length)
+      formData.append('reviewIds', standardString)
+    }
+    // else{
+    //   console.log("else block reciew ids" , standardString?.length)
+    // }
+    // console.log("form data",formData)
+   
     dispatch(LoaderStatus(true))
     
     axios({
@@ -144,32 +178,80 @@ export const NewReport=()=>{
       // console.log(res)
       dispatch(LoaderStatus(false))
       if(res?.data?.statusCode===200){
+        reset()
+        reset(defaultValues)
         setShowGreen(true)
         setAlertValue(res?.data?.message)
+       
+        localStorage.setItem("SelectedProject", JSON.stringify(ProjectCreatedData))
+      dispatch(ProjectNumber(ProjectCreatedData))
+        
+
       }
       else{
+        
         setShowRed(true)
         setAlertValue(res?.data?.message)
       }
        
       })
       .catch(error=>{
-        // console.log("Error block new reports", error);
-        if(error?.code==="ERR_NETWORK"){
+      
+        console.log("Error block new reports", error);
+        if( error?.response?.status==401){
           dispatch(LoginDetails({}));
               cookies.remove('connect.sid');
               localStorage.setItem("AlertMessage", JSON.stringify("Session Expired...Please Login Again"))
             navigate('/')
+        }
+        else{
+          setShowRed(true)
+        setAlertValue(error?.response?.data?.message || error?.message)
+        dispatch(LoaderStatus(false))
         }
       })
     
   });
   useEffect(()=>{
     dispatch(LoaderStatus(false))
+    axios({
+
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: `${BACKEND_URL}/report/review/standards`,
+      
+      headers:myHeaders,
+       
+        credentials: "include", 
+        withCredentials:true,
+     
+    }).then(res=>{
+      // console.log("Resp from review standards api- ",res)
+      setStandards(res?.data?.data)
+       
+      })
+      .catch(error=>{
+        console.log("Error block new reports", error);
+        if(error?.code==="ERR_NETWORK" || error?.response?.status==401){
+          dispatch(LoginDetails({}));
+              cookies.remove('connect.sid');
+              localStorage.setItem("AlertMessage", JSON.stringify("Session Expired...Please Login Again"))
+            navigate('/')
+        }
+        else{
+          setShowRed(true)
+        setAlertValue(error?.response?.data?.message)
+        dispatch(LoaderStatus(false))
+        }
+      })
   },[])
+  useEffect(()=>{
+    // console.log("STandatd state-", standards)
+    setSlicedStandards(standards?.slice(0,4))
+  },[standards])
 return(
   <>
-  <div className='d-flex justify-content-center' style={{position:"sticky", top:"0"}}>
+  <div className='d-flex justify-content-center' style={{position:"sticky", top:"0", zIndex:"9"}}>
    {showGreen?<>
       <Alert className="col-12 col-md-8 col-lg-6 p-1 d-flex align-items-center justify-content-between" show={showGreen} variant="success" style={{zIndex:"9"}} >
         <p style={{marginBottom:"0"}}>{alertValue}</p>
@@ -180,7 +262,7 @@ return(
             </Button>
       </Alert>
     </>:<>
-    <Alert className="col-12 col-md-8 col-lg-6 p-1 d-flex align-items-center justify-content-between mx-2" show={showRed} variant="danger" style={{zIndex:"9"}} >
+    <Alert className="col-12 col-md-8 col-lg-6 p-1 d-flex align-items-center justify-content-between mx-2" show={showRed} variant="danger" >
         <p style={{marginBottom:"0"}}>{alertValue}</p>
         <Button style={{fontSize:"80%"}} onClick={() => setShowRed(false)} variant="outline-danger">
             Close
@@ -196,28 +278,31 @@ return(
 <div className='"leftSideNRep'>
 <form className='custom_form' style={{
   display: "flex",
-  flexDirection: "column"
+  justifyContent:"space-around"
 }}
     >
+  <div className='newLeftContainer'>
+
 
 <div className="mb-3 customColor">
   <label htmlFor="reportNumber" className="form-label"> *Report Name</label>
-  <input type="reportNumber" className="form-control custom_txtbox" id="reportNumber" {...register("report_name",{ required: true})}/>
-  {errors.name && <span style={{color:"red"}}>This field is required</span>}
+  <input type="reportNumber" className="form-control custom_txtbox" id="reportname" {...register("report_name",{ required: true})}/>
+  {errors.report_name && <span style={{color:"red"}}>This field is required</span>}
 </div>
 <div className="mb-3 customColor">
-  <label htmlFor="dateIssued" className="form-label"> *Date Issued</label>
-  <input type="date" className="form-control custom_txtbox" id="dateIssued" placeholder="MM/YY/XXXX"  {...register("issued_at",{ required: true})} />
+  <label htmlFor="dateIssued" className="form-label "> *Date Issued</label>
+  <input type="date" className="form-control custom_txtbox custsession-date" id="dateIssued" placeholder="MM/YY/XXXX"  {...register("issued_at",{ required: false})} max={moment().format("YYYY-MM-DD")}/>
   {errors.issued_at && <span style={{color:"red"}}>This field is required</span>}
 </div>
 <div className="mb-3 customColor">
   <label htmlFor="tags" className="form-label">Tags</label>
   <input type="tags" className="form-control custom_txtbox" id="tags" placeholder="Select Report Tags"{...register("tags")}/>
+  
 </div>
 <div className="mb-3 customColor">
   <label htmlFor="receivingContacts" className="form-label"> *Receiving Customer</label>
   <div className='parentSearchResult'>
-  <input type="receivingContacts" className="form-control custom_txtbox" id="receiving_customer" placeholder="Choose a receiving contact" {...register("receiving_customer",{ required: true})} 
+  <input type="receivingContacts" className="form-control custom_txtbox" autoComplete='off' id="receiving_customer" placeholder="Choose a receiving contact" {...register("receiving_customer",{ required: true})} 
   
   onChange={debounce(async (e) => {
     let str = e.target.value
@@ -293,18 +378,23 @@ return(
       <div className="container">
   <nav className="navbar navbar-expand-lg bg-light">
     <div className="container-fluid">
-     {
-    
-     Object.keys(list).map((v , index)=>{
-      return <div key={index}>
-       <li  style={{color:`${name===v?"blue":"Black"}`}}   onClick={dataHandler.bind(null,v)} className="navbar-brand report_navbar">{v}</li>
-      <svg className="bi bi-info-circle report_icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-         <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-      </svg>
+     
+      <div className='d-flex'>
+       <div className={activeStandard === 1 ? 'text-primary d-flex':"d-flex"} style={{fontSize:"0.8rem", cursor:"pointer"}} onClick={()=>{
+        setSlicedStandards(standards?.slice(0,4))
+        setActiveStandard(1)
+       }}><span><InfoSvg /></span> Assigned</div>
       
+       <div  className={activeStandard === 2 ? 'text-primary d-flex':"d-flex"} style={{fontSize:"0.8rem",padding:"0 1.13rem" , cursor:"pointer"}} onClick={()=>{
+        setSlicedStandards(standards?.slice(4,8))
+        setActiveStandard(2)
+       }}><InfoSvg /> Add Lab Standards</div>
+       <div  className={activeStandard === 3 ? 'text-primary d-flex':"d-flex"} style={{fontSize:"0.8rem",padding:"0 1.13rem" , cursor:"pointer"}} onClick={()=>{
+        setActiveStandard(3)
+        setSlicedStandards(standards?.slice(8,12))}
+        }><InfoSvg /> Add GLobal Standards</div>
       </div>
-     })}
+     
       
     </div>
   </nav>
@@ -316,35 +406,25 @@ return(
             <th> Description </th>
             </tr>
             <hr className="report_hr"></hr>
-            <tr className="report_td">
-            <td><input type="checkbox" id="standard1" name="standard1" onChange={countHandler} {...register("standard1")}></input></td>
-              <td> {data[0]}</td>
-              <td> {data[1]} </td>
-            </tr>
+           
+            {slicedStandards?.length>0 ? slicedStandards?.map((stand)=>{
+              return(
+               <tr className="report_td" key={stand?.id}>
+                <td><input type="checkbox" id="standard1" name="standard1"  {...register(`${stand?.id}`)} ></input></td>
+                <td> {stand?.standard}</td>
+                <td> {stand?.description} </td>
+              </tr>
+              )
+            }):""}
+          
             <hr className="report_hr"></hr>
-            <tr className="report_td">
-            <td><input type="checkbox" id="standard2" name="standard2" onChange={countHandler} {...register("standard2")}></input></td>
-              <td> {data[2]}</td>
-              <td> {data[3]} </td>
-            </tr>
-            <hr className="report_hr"></hr>
-            <tr className="report_td">
-            <td><input type="checkbox" id="standard3" name="standard3" onChange={countHandler} {...register("standard3")}></input></td>
-              <td> {data[4]}</td>
-              <td> {data[5]} </td>
-            </tr>
-            <hr className="report_hr"></hr>
-            <tr className="report_td">
-            <td><input className="report_checkbox" type="checkbox" id="standard4" name="standard4" onChange={countHandler} {...register("standard4")}></input></td>
-              <td> {data[6]}</td>
-              <td> {data[7]} </td>
-            </tr>
+            
         
             {/* onClick={()=>alert("Standards added successfully!") */}
     </table>
       </div>
       <div className="modal-footer">
-        <button type="button" className="btn btn-primary modal_btn" data-bs-dismiss="modal" onClick={()=>message()}>ADD STANDARDS TO REVIEW</button>
+        <button type="button" className="btn btn-primary modal_btn" data-bs-dismiss="modal" onClick={()=>{}}>ADD STANDARDS TO REVIEW</button>
         {/* data-bs-dismiss={close?"modal":""}  */}
         <button type="button" className="btn btn-secondary modal_btn" data-bs-dismiss="modal">CANCEL</button>
       </div>
@@ -355,7 +435,7 @@ return(
 <div className="mb-3 customColor">
   <label htmlFor="availableReviewers" className="form-label">*Available Reviewers</label>
   <div className='parentSearchResult'>
-  <input type="availableReviewers" className="form-control custom_txtbox" id="reviewer_id" {...register("reviewer_id",{ required: true})}
+  <input type="availableReviewers" className="form-control custom_txtbox" id="reviewer_id" {...register("reviewer_id",{ required: true})} autoComplete="off"
    onChange={debounce(async (e) => {
     let str = e.target.value
     // console.log("str check", str)
@@ -372,7 +452,7 @@ return(
         withCredentials:true,
     })
     .then(function (response) {
-      console.log(response.data);
+      // console.log(response.data);
       if(response.data?.data.length>0){
 
         setSearchResults1(response.data?.data)
@@ -410,14 +490,13 @@ return(
 <div className="mb-3 customColor">
   <textarea className="form-control custom_txtbox" id="exampleFormControlTextarea1" placeholder="Review Comments" rows="3" {...register("comments")}></textarea>
 </div>
-</form>
- </div>
- <div className='rightsifeNrep'>
-<form className='custom_form'>
+</div>
+
+<div className='newRightContainer'>
 <div className="mb-3 customColor">
   <label htmlFor="availableReviewers" className="form-label">*Project Number</label>
   <div className='parentSearchResult'>
-  <input type="availableReviewers" className="form-control custom_txtbox" id="projectNumber" {...register("project_number",{ required: true})}
+  <input type="availableReviewers" className="form-control custom_txtbox" autoComplete='off' id="projectNumber" {...register("project_number",{ required: true})}
    onChange={debounce(async (e) => {
     let str = e.target.value
     // console.log("str check", str)
@@ -434,7 +513,7 @@ return(
         withCredentials:true,
     })
     .then(function (response) {
-      console.log(response.data);
+      // console.log(response.data);
       if(response.data?.data.length>0){
 
         setSearchResults2(response.data?.data)
@@ -460,6 +539,7 @@ return(
                 return <div key={index} className='searchItem' onClick={()=>{
                   document.getElementById("projectNumber").value = result.project_number;
                   document.getElementById("projectNumber").focus();
+                  setProjectCreatedData({"project_number":result?.project_number,"project_name":result?.project_name})
                   setSearchResults2([])
                 }}>{result?.project_number}- {result?.project_name}</div>
                 
@@ -476,7 +556,8 @@ return(
 </div>
 <div className="mb-3 customColor">
   <label htmlFor="models" className="form-label">Models</label>
-  <textarea className="form-control custom_txtbox" id="models" rows="2" {...register("models")} ></textarea>
+  <textarea className="form-control custom_txtbox" id="models" rows="2" {...register("models", {required:true})} ></textarea>
+  {errors.models && <span style={{color:"red"}}>This field is required</span>}
 </div>
 
 
@@ -488,12 +569,13 @@ return(
         <p className='m-0 mr-3'>Report Type</p>
       <Controller style={{width:"200px"}}
         name="report_type"
+        defaultValue={""}
+
         control={control}
         render={({ field }) => (
         <Select  
-            // defaultValue={options[0]}
             {...field}
-            isClearable
+            isClearable={true}
             isSearchable={false}
             className="react-dropdown"
             classNamePrefix="dropdown"
@@ -503,9 +585,12 @@ return(
     />
     </div>
     <p>{errors.status?.message || errors.status?.label.message}</p>
-      <input className='choose_file'  type="file" {...register("report",{required: true})} placeholder="Drag and Drop"/>
+      <input className='choose_file'  type="file"  name='report' {...register("report",{required: false})} placeholder="Drag and Drop"/>
         <i className="fas fa-cloud-upload-alt"/>
         <p className="drag_text">Max File Size: 25MB: Max Files: 1/Type: .doc,.docx,.xls,.xlsx,.xlsm,.xlsb</p>
+        {errors.report && (
+            <span style={{ color: "red" }}> {errors.report?.message}</span>
+          )}
     </label>
 
 </div>
@@ -517,10 +602,11 @@ return(
         <p className='m-0 mr-3'>Certificate Type</p>
       <Controller  style={{width:"200px !important"}}
         name="certificate_type"
+        defaultValue={""}
+
         control={control}
         render={({ field }) => (
         <Select 
-            // defaultValue={options[0]}
             {...field}
             isClearable
             isSearchable={false}
@@ -531,23 +617,44 @@ return(
         )}
     />
     </div>
-    <input  type="file" className='choose_file' {...register("certificate",{required: true})} />
+    <input  type="file" className='choose_file' name='certificate' {...register("certificate",{required: false},
+    // {
+    //   validate: {
+    //     lessThan10MB: files => files[0]?.size < 10000000 || 'Max 10MB',
+    //     acceptedFormats: certificate =>
+    //       ['image/jpeg', 'image/png', 'image/gif'].includes(
+    //         certificate[0]?.type
+    //       ) || 'Only PNG, JPEG e GIF',
+    //   },
+    // }
+    )} 
+    
+    />
     
         <i className="fas fa-cloud-upload-alt"/>
         <p className="drag_text">Max File Size: 25MB: Max Files: 1/Type: .doc,.docx,.xls,.xlsx,.xlsm,.xlsb</p>
+        {errors.certificate && (
+            <span style={{ color: "red" }}> {errors.certificate?.message}</span>
+          )}
     </label>
-
+ 
+</div>
 </div>
 
-<div className='custom3btn'>
-<button className="btn btn-primary " type="submit">SAVE AS DRAFTS</button>
-<button className="btn btn-success btn_custom1 mx-2" type="submit" onClick={
+</form>
+<div className='custom3btn' style={{marginRight:"6.7rem"}}>
+<button className="btn btn-primary" id='sd' >SAVE AS DRAFTS</button>
+<button className="btn btn-success btn_custom1 mx-2" id='sr' name='sr' type="submit" onClick={
         handleSubmit(onSubmit)}>SUBMIT REVIEW</button>
 <button className="btn btn-primary btn_custom2" onClick={()=>{navigate('/view/assignedProjects')}}>CANCEL</button>
 </div>
-</form>
+ </div>
+ 
+
+
 </div>
-</div>
+
+
 </div>
 
  </>   )

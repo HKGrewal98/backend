@@ -1,18 +1,152 @@
-import React from 'react'
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import {EditSvg} from '../../Icons/EditSvg'
+import axios from 'axios';
+import { useForm, SubmitHandler } from "react-hook-form";
+import BACKEND_URL from '../../../backendUrl';
+import { LoaderStatus } from '../../Common/LoaderReducer/LoaderSlice';
+import { Reports } from '../EngineerMain/EngineerReducers/ReportDetails';
+import debounce from 'debounce'
+import { LoginDetails } from '../../Login/LoginReducer/LoginSlice';
+import Cookies from "universal-cookie"
+import { useNavigate } from 'react-router-dom';
 
-export const EditReportChildContent = () => {
+
+
+
+export const EditReportChildContent = (props) => {
+  const [standards , setStandards] = useState([])
+  const [slicedStandards, setSlicedStandards] = useState([])
+  const [activeStandard, setActiveStandard] = useState(1)
   const ReportsDetailsRedux = useSelector((state) => state.ReportDetails.value);
+  const { register, handleSubmit,getValues , trigger, formState: { errors }} = useForm();
+  const[searchResults, setSearchResults] = useState([])
+  const[searchResults1, setSearchResults1] = useState([])
 
+  const cookies = new Cookies()
+  const navigate = useNavigate()
+  const [inputDisabledState, setInputDisabledState] = useState(true)
+  const dispatch = useDispatch()
+  var myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("Access-Control-Allow-Origin", "http://localhost:8081");
+  myHeaders.append("Access-Control-Allow-Credentials", true);
+
+  function removeEmptyFields(data) {
+    Object.keys(data).forEach(key => {
+      if (data[key] === '' || data[key] == null || data[key]== NaN || data[key]=== undefined) {
+        delete data[key];
+      }
+    });
+  }
+  
+  const  onSubmit= ((fdata) => {
+    removeEmptyFields(fdata)
+    // console.log(fdata)
+    if(fdata?.project_name){
+      let newData = {
+        "metaInfo": "project_info",
+        "data" : {
+          project_name: fdata?.project_name
+        },
+        "where": ReportsDetailsRedux?.report?.report_number
+      }
+      updateData(newData)
+    }
+   if(fdata?.products_covered || fdata?.models || fdata?.comments || fdata?.receiving_customer || fdata?.reviewer_id){
+    let {project_name, ...data} = fdata
+    let newData = {
+      "metaInfo": "report",
+        data,
+      "where": ReportsDetailsRedux?.report?.report_number
+    }
+    updateData(newData)
+   }
+ 
+   
+    
+  });
+  const updateData = async (data)=>{
+    // console.log("sending data", data)
+    dispatch(LoaderStatus(true))
+   await axios({
+      method: 'post',
+      maxBodyLength: Infinity,
+        url: `${BACKEND_URL}/report/update`,
+        headers:myHeaders,
+        data : {
+          ...data,
+         
+        },
+        credentials: "include", 
+        withCredentials:true,
+    })
+    .then(function (response) {
+      // console.log(response.data);
+      if(response?.data?.statusCode === 200){
+        
+        props.getReportById(ReportsDetailsRedux?.report?.report_number)
+        setInputDisabledState(true)
+        
+      }
+     
+    })
+    .catch(function (error) {
+      dispatch(LoaderStatus(false))
+      console.log(error);
+      
+    });
+    
+  }
+  useEffect(()=>{
+    dispatch(LoaderStatus(false))
+    axios({
+
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: `${BACKEND_URL}/report/review/standards`,
+      
+      headers:myHeaders,
+       
+        credentials: "include", 
+        withCredentials:true,
+     
+    }).then(res=>{
+      // console.log("Resp from review standards api- ",res)
+      setStandards(res?.data?.data)
+       
+      })
+      .catch(error=>{
+        console.log("Error block new reports", error);
+        if(error?.code==="ERR_NETWORK" || error?.response?.status==401){
+          dispatch(LoginDetails({}));
+              cookies.remove('connect.sid');
+              localStorage.setItem("AlertMessage", JSON.stringify("Session Expired...Please Login Again"))
+            navigate('/')
+        }
+        else{
+        //   setShowRed(true)
+        // setAlertValue(error?.response?.data?.message)
+        dispatch(LoaderStatus(false))
+        }
+      })
+  },[])
+  useEffect(()=>{
+    // console.log("STandatd state-", standards)
+    setSlicedStandards(standards?.slice(0,4))
+  },[standards])
   return (
+    <>
     <div className="reviewparents">
     <div className="review">
+     
       <div className="ProjectNumber">
-        <section>Project Number</section>
+        <section>Project Number <span style={{cursor:"pointer"}} onClick={()=>setInputDisabledState(!inputDisabledState)}><EditSvg /></span></section>
         <input
           type="text"
           placeholder={ReportsDetailsRedux?.project?.project_number || ReportsDetailsRedux?.report?.project_number}
           disabled
+          
         ></input>
       </div>
 
@@ -20,8 +154,8 @@ export const EditReportChildContent = () => {
         <section>Review Type</section>
         
         {ReportsDetailsRedux?.documents && ReportsDetailsRedux?.documents[0]?.type === "certificate" ? <>
-        <input type="text" disabled placeholder="Certificate"></input>
-        </>:<input type="text" disabled placeholder="Report"></input> }
+        <input type="text" disabled placeholder="Certificate"   {...register("certificate")}></input>
+        </>:<input type="text" disabled placeholder="Report" autoFocus  {...register("report")}></input> }
        
       </div>
 
@@ -62,7 +196,13 @@ export const EditReportChildContent = () => {
           disabled
         ></input>
         </>:""}
-       
+        {ReportsDetailsRedux?.documents && ReportsDetailsRedux?.documents[0]?.sub_type ===5 ? <>
+          <input
+          type="text"
+          placeholder="Samples"
+          disabled
+        ></input>
+        </>:""}
     
       </div>
 
@@ -73,12 +213,14 @@ export const EditReportChildContent = () => {
           placeholder={
             ReportsDetailsRedux?.report?.receiving_customer 
           }
+        
           disabled
+
         ></input>
       </div>
 
       <div className="ResponsiblePerson">
-        <section>Responsible Person</section>
+        <section>Responsible Person  </section>
         <input
           type="text"
           placeholder={
@@ -90,24 +232,119 @@ export const EditReportChildContent = () => {
         ></input>
       </div>
 
-      <div className="ReviewerDate">
-        <section>Reviewer</section>
-        <input type="text" disabled placeholder= {
-            ReportsDetailsRedux?.report?.reviewer_id 
-           
-          }></input>
+      <div className="ReviewerDate position-relative">
+        <section>Reviewer  <span style={{cursor:"pointer"}} onClick={()=>setInputDisabledState(!inputDisabledState)}><EditSvg /></span></section>
+        <input id='reviewer_id' {...register("reviewer_id")} type="text" disabled={inputDisabledState} placeholder= {
+            ReportsDetailsRedux?.report?.reviewer_id }
+            onChange={debounce(async (e) => {
+              let str = e.target.value
+              // console.log("str check", str)
+              let data={
+                name: str
+              }
+              axios({
+                method: 'get',
+                maxBodyLength: Infinity,
+                  url: `${BACKEND_URL}/user/search`,
+                  params : data,
+                
+                  credentials: "include", 
+                  withCredentials:true,
+              })
+              .then(function (response) {
+                // console.log(response.data);
+                if(response.data?.data.length>0){
+          
+                  setSearchResults1(response.data?.data)
+                }
+                else{
+                  setSearchResults1([])
+                }
+               
+              })
+              .catch(function (error) {
+                console.log("Error block", error);
+               
+              });
+            }, 800)}
+            ></input>
+             <div className='searchResultsContainer'>
+            {searchResults1?.length>0? 
+              <div className='searchResults'>
+            {searchResults1?.length>0? searchResults1.map((result)=>{
+             
+                
+                return <div key={result?.id} className='searchItem' onClick={()=>{
+                  document.getElementById("reviewer_id").value = result.id;
+                  document.getElementById("reviewer_id").focus();
+                  setSearchResults1([])
+                }}>{result?.id}- {result?.name}</div>
+                
+              
+            }):""
+          }</div>:""}
+          </div>
       </div>
     </div>
     <div className="reportsreceivingcontainer">
-      <div className="ReportRecieving">
-        <section>Report Recieving Customer</section>
+      <div className="ReportRecieving position-relative">
+        <section>Report Recieving Customer <span style={{cursor:"pointer"}} onClick={()=>setInputDisabledState(!inputDisabledState)}><EditSvg /></span></section>
         <input
           type="text"
+          id='receiving_customer'
+          {...register("receiving_customer")}
           placeholder={
             ReportsDetailsRedux?.report?.receiving_customer
           }
-          disabled
+          disabled={inputDisabledState}
+          onChange={debounce(async (e) => {
+            let str = e.target.value
+            // console.log("str check", str)
+            let data={
+              name: str
+            }
+            axios({
+              method: 'get',
+              maxBodyLength: Infinity,
+                url: `${BACKEND_URL}/user/search`,
+                params : data,
+              
+                credentials: "include", 
+                withCredentials:true,
+            })
+            .then(function (response) {
+              // console.log(response.data);
+              if(response.data?.data.length>0){
+        
+                setSearchResults(response.data?.data)
+              }
+              else{
+                setSearchResults([])
+              }
+             
+            })
+            .catch(function (error) {
+              console.log("Error block", error);
+             
+            });
+          }, 800)}
         ></input>
+         <div className='searchResultsContainer'>
+            {searchResults?.length>0? 
+              <div className='searchResults'>
+            {searchResults?.length>0? searchResults.map((result)=>{
+             
+                
+                return <div key={result?.id} className='searchItem' onClick={()=>{
+                  document.getElementById("receiving_customer").value = result.id;
+                  document.getElementById("receiving_customer").focus();
+                  setSearchResults([])
+                }}>{result?.id}- {result?.name}</div>
+                
+              
+            }):""
+          }</div>:""}
+          </div>
       </div>
 
       <div className="ReportReview">
@@ -135,45 +372,153 @@ export const EditReportChildContent = () => {
       </div>
 
       <div className="ProductsCovered">
-        <section>Products Covered</section>
+        <section>Products Covered  <span style={{cursor:"pointer"}} onClick={()=>setInputDisabledState(!inputDisabledState)}><EditSvg /></span></section>
         <input
           type="text"
           placeholder={ReportsDetailsRedux?.report?.products_covered || ReportsDetailsRedux?.project?.product_covered}
-          disabled
+          disabled={inputDisabledState}
+          {...register("products_covered")}
         ></input>
       </div>
 
       <div className="Models">
-        <section>Models</section>
+        <section>Models  <span style={{cursor:"pointer"}} onClick={()=>setInputDisabledState(!inputDisabledState)}><EditSvg /></span></section>
         <input
           type="text"
           placeholder={ReportsDetailsRedux?.report?.models || ReportsDetailsRedux?.project?.modals}
-          disabled
+          disabled={inputDisabledState}
+          {...register("models")}
         ></input>
       </div>
 
       <div className="Project">
-        <section>Project</section>
+        <section>Project  <span style={{cursor:"pointer"}} onClick={()=>setInputDisabledState(!inputDisabledState)}><EditSvg /></span></section>
         <input
           type="text"
           placeholder={ReportsDetailsRedux?.report?.['project_number_fk.project_name']}
-          disabled
+          disabled={inputDisabledState}
+          {...register("project_name")}
         ></input>
       </div>
 
       <div className="Comments">
-        <section>Comments:</section>
+        <section>Comments  <span style={{cursor:"pointer"}} onClick={()=>setInputDisabledState(!inputDisabledState)}><EditSvg /></span></section>
         <input
           type="text"
           placeholder={ReportsDetailsRedux?.report?.report_comments ||  ReportsDetailsRedux?.report?.comments}
-          disabled
+          disabled={inputDisabledState}
+          {...register("comments")}
         ></input>
       </div>
     </div>
+    <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div className="modal-dialog">
+    <div className="modal-content">
+    <div className="modal-header custom_title">
+        <h6 className="modal-title fs-5 custom_title" id="exampleModalLabel">Assign Standards to Review</h6>
+      </div>
 
-    <div className="Reportsstandards">
-      <section>Report Standards</section>
+      <div className="modal-body">
+      
+
+      {/* ------Navbar */}
+      <div className="container">
+  <nav className="navbar navbar-expand-lg bg-light">
+    <div className="container-fluid">
+     
+      <tr className='d-flex'>
+       <td className={activeStandard === 1 ? 'text-primary':""} style={{fontSize:"0.8rem",padding:"0 1.13rem" , cursor:"pointer"}} onClick={()=>{
+        setSlicedStandards(standards?.slice(0,4))
+        setActiveStandard(1)
+       }}>Assigned</td>
+       <td  className={activeStandard === 2 ? 'text-primary':""} style={{fontSize:"0.8rem",padding:"0 1.13rem" , cursor:"pointer"}} onClick={()=>{
+        setSlicedStandards(standards?.slice(4,8))
+        setActiveStandard(2)
+       }}>Add Lab Standards</td>
+       <td  className={activeStandard === 3 ? 'text-primary':""} style={{fontSize:"0.8rem",padding:"0 1.13rem" , cursor:"pointer"}} onClick={()=>{
+        setActiveStandard(3)
+        setSlicedStandards(standards?.slice(8,12))}
+        }>Add GLobal Standards</td>
+      </tr>
+     
+      
+    </div>
+  </nav>
+</div>
+      <table>
+          <tr>
+            <th> </th>
+            <th> Standard </th>
+            <th> Description </th>
+            </tr>
+            <hr className="report_hr"></hr>
+           
+            {slicedStandards?.length>0 ? slicedStandards?.map((stand)=>{
+              return(
+               <tr className="report_td" key={stand?.id}>
+                <td><input type="checkbox" id="standard1" name="standard1"  {...register(`${stand?.id}`)} ></input></td>
+                <td> {stand?.standard}</td>
+                <td> {stand?.description} </td>
+              </tr>
+              )
+            }):""}
+          
+            <hr className="report_hr"></hr>
+            
+        
+            {/* onClick={()=>alert("Standards added successfully!") */}
+    </table>
+      </div>
+      <div className="modal-footer">
+        <button type="button" className="btn btn-primary modal_btn" data-bs-dismiss="modal" onClick={()=>{}}>ADD STANDARDS TO REVIEW</button>
+        {/* data-bs-dismiss={close?"modal":""}  */}
+        <button type="button" className="btn btn-secondary modal_btn" data-bs-dismiss="modal">CANCEL</button>
+      </div>
     </div>
   </div>
+</div>                  
+    <div className="Reportsstandards" style={{maxWidth:"600px" , maxHeight:"350px", overflow:"auto"}}>
+      <section>Report Standards
+      {/* {inputDisabledState === false ? <>
+        <label>
+      <div className='reportStandardIcon'  data-bs-toggle="modal" data-bs-target="#exampleModal" >+</div></label>
+   <label className="custom_label1">*Click(+) to edit some Standards</label>
+   </>:""} */}
+
+      </section>
+      <table class="table" style={{margin:"0", backgroundColor:"white", borderBottom:"0",width:"600px",marginTop: "0"}}>
+  <thead>
+    <tr>
+      <th scope="col" >Type</th>
+      <th scope="col">Standard</th>
+      <th scope="col">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {ReportsDetailsRedux?.standards?.length>0 ? 
+    <>
+      {ReportsDetailsRedux?.standards.map((standard)=>{
+        return(
+          <tr key={standard?.id} style={{backgroundColor:"white"}}>
+          <th >{standard?.standard_type}</th>
+          <td>{standard?.standard}</td>
+          <td>{standard?.description}</td>
+        </tr>
+        )
+      })}
+    </>
+    :""}
+   
+   
+  </tbody>
+</table>
+    </div>
+  </div>
+  {inputDisabledState === false ? <>
+    <button className='btn ' style={{marginLeft:"4.5rem", borderRadius:"13px", backgroundColor:"rgba(0, 125, 153, 1)", color:"white"}} onClick={handleSubmit(onSubmit)}>Save</button>
+  </>:""}
+ 
+
+  </>
   )
 }

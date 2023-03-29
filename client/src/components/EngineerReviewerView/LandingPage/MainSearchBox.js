@@ -7,9 +7,9 @@ import Modal from 'react-bootstrap/Modal';
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from 'universal-cookie'
-import { useDispatch } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { LoginDetails } from "../../Login/LoginReducer/LoginSlice";
-import {ProjectNumber} from "../AssignedProjects/AssignedProjectsReducer/ProjectNumber";
+import {ProjectNumber} from "../EngineerMain/EngineerReducers/ProjectNumber";
 import BACKEND_URL from "../../../backendUrl";
 
 export const MainSearchBox = () => {
@@ -36,6 +36,10 @@ export const MainSearchBox = () => {
   const onSubmit = (data) => {
     removeEmptyFields(data);
     // console.log(data);
+    Object.keys(data).forEach(key => {
+      data[key] = data[key].trim()
+    })
+   
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append('Access-Control-Allow-Origin', 'http://localhost:8081')
@@ -106,7 +110,7 @@ export const MainSearchBox = () => {
             
             </div>
             )
-          }):"No results"}
+          }):"Please try with different criteria"}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>

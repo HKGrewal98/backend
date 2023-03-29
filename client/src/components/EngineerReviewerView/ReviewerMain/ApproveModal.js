@@ -4,7 +4,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import BACKEND_URL from '../../../backendUrl';
 import axios from 'axios';
 import { LoaderStatus } from '../../Common/LoaderReducer/LoaderSlice';
-import { Reports } from '../AssignedProjects/AssignedProjectsReducer/ReportDetails';
+import { Reports } from '../EngineerMain/EngineerReducers/ReportDetails';
 
 
 export const ApproveModal = (props) => {

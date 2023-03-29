@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import BACKEND_URL from '../../../backendUrl';
 import { LoaderStatus } from '../../Common/LoaderReducer/LoaderSlice';
-import { Reports } from '../AssignedProjects/AssignedProjectsReducer/ReportDetails';
+import { Reports } from '../EngineerMain/EngineerReducers/ReportDetails';
 
 export const HoldModal = (props) => {
   const { register, handleSubmit,getValues , trigger, formState: { errors }} = useForm();

@@ -409,4 +409,22 @@ border: 1px solid #C3C3C3;
   background-color: #E2FFE2;
  
 }
-/* Custom Modal */
+/* DAte */
+
+input.custsession-date {
+  /* display: inline-block; */
+  position: relative;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+}

@@ -5,7 +5,7 @@ import { div, useNavigate } from "react-router-dom";
 import BACKEND_URL from "../../../backendUrl";
 import { LoaderStatus } from "../../Common/LoaderReducer/LoaderSlice";
 import { InfoSvg } from "../../Icons/InfoSvg";
-import { Reports } from "../AssignedProjects/AssignedProjectsReducer/ReportDetails";
+import { Reports } from "../EngineerMain/EngineerReducers/ReportDetails";
 import { ReviewerAllReports } from "./ReviewerReducers/ReviewerAllReportsSlice";
 import "./ReviewMain.css";
 
@@ -14,6 +14,8 @@ const ReviewMainPage = () => {
   const reviewData = useSelector((state) => state.ReviewerData.value);
   const [offset, setOffset] = useState(0)
   const [screenId, setScreenId] = useState(4)
+  const [showNextButton, setShowNextButton] = useState(true)
+  const [showPrevButton, setShowPrevButton] = useState(true)
   
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
@@ -25,20 +27,19 @@ const ReviewMainPage = () => {
   const dispatch = useDispatch();
 
   const nextPage = () => {
-  //  setLimit(limit+8)
-  // console.log(screenId)
+  
   if(reviewData?.length>=8){
-
-    setOffset(offset+8)
-    getReviewPageData({"offset":offset})
+    let newOffset = offset+8
+    setOffset(newOffset)
+    getReviewPageData({"newOffset":newOffset})
   }
 
   };
   const prevPage = () => {
    if(offset>=8){
-    // setLimit(limit-8)
-    setOffset(offset-8)
-    getReviewPageData({"offset":offset})
+    let newOffset = offset-8
+    setOffset(newOffset)
+    getReviewPageData({"newOffset":newOffset})
 
    }
   };
@@ -58,7 +59,7 @@ const ReviewMainPage = () => {
       maxBodyLength: Infinity,
       url: `${BACKEND_URL}/project/notifications`,
       params: {
-        "offset": dataObj?.offset || 0,
+        "offset": dataObj?.newOffset || 0,
         "limit":  8,
         "screenId": sId
       },
@@ -70,6 +71,14 @@ const ReviewMainPage = () => {
         dispatch(LoaderStatus(false));
         //  console.log("response ", res.data)
         if (res?.data?.data) {
+          if(res.data.data.length<8 && offset==0){
+            setShowNextButton(false)
+            setShowPrevButton(false)
+          }
+          else{
+            setShowNextButton(true)
+            setShowPrevButton(true)
+          }
           dispatch(ReviewerAllReports(res?.data?.data));
           //  setReviewData(res?.data?.data)
         }
@@ -92,9 +101,10 @@ const ReviewMainPage = () => {
   return (
     <div>
       <div className="containerbox" style={{ padding: "0.5rem", }}>
-        <div
+        <div 
+         className={screenId === 1 ? 'text-primary':""}
           style={{"display": "flex",
-            alignItems: "center",
+            alignItems: "baseline",
             fontSize:"0.8rem",cursor:"pointer" }}
             onClick={()=>{
               setOffset(0)
@@ -109,7 +119,7 @@ const ReviewMainPage = () => {
          
          
           style={{"display": "flex",
-            alignItems: "center",
+          alignItems: "baseline",
             fontSize:"0.8rem",
             cursor:"pointer" 
           }}
@@ -121,9 +131,10 @@ const ReviewMainPage = () => {
 
         <div
         
-         
+      
+         className={screenId === 3 ? 'text-primary':""}
           style={{"display": "flex",
-            alignItems: "center",
+          alignItems: "baseline",
             fontSize:"0.8rem",
             cursor:"pointer" 
           }}
@@ -137,8 +148,9 @@ const ReviewMainPage = () => {
         </div>
 
         <div
+         className={screenId === 4 ? 'text-primary':""}
          style={{"display": "flex",
-            alignItems: "center",
+         alignItems: "baseline",
             cursor:"pointer" ,
             fontSize:"0.8rem"}}
             onClick={()=>{
@@ -152,9 +164,9 @@ const ReviewMainPage = () => {
 
         <div
         
-         
+        className={screenId === 8 ? 'text-primary':""}
           style={{"display": "flex",
-            alignItems: "center",
+          alignItems: "baseline",
             cursor:"pointer" ,
             fontSize:"0.8rem"}}
             onClick={()=>{
@@ -168,9 +180,9 @@ const ReviewMainPage = () => {
 
         <div
      
-         
+     className={screenId === 7 ? 'text-primary':""}
           style={{"display": "flex",
-            alignItems: "center",
+          alignItems: "baseline",
             cursor:"pointer" ,
             fontSize:"0.8rem"}}
             onClick={()=>{
@@ -217,9 +229,9 @@ const ReviewMainPage = () => {
 
         <div
         
-         
+        className={screenId === 6 ? 'text-primary':""}
           style={{"display": "flex",
-            alignItems: "center",
+          alignItems: "baseline",
             cursor:"pointer" ,
             fontSize:"0.8rem"}}
             onClick={()=>{
@@ -233,9 +245,9 @@ const ReviewMainPage = () => {
 
         <div
         
-         
+        className={screenId === 5 ? 'text-primary':""}
           style={{"display": "flex",
-            alignItems: "center",
+          alignItems: "baseline",
             cursor:"pointer" ,
             fontSize:"0.8rem"}}
             onClick={()=>{
@@ -249,22 +261,24 @@ const ReviewMainPage = () => {
 
         <div
         
-         
+        // className={screenId === 8 ? 'text-primary':""}
           style={{"display": "flex",
-            alignItems: "center",
+          alignItems: "baseline",
             cursor:"pointer" ,
             fontSize:"0.8rem"}}
             onClick={()=>{
               setOffset(0)
               setScreenId(3)
-              getReviewPageData({screenId:"8"})}}
+              // getReviewPageData({screenId:"8"})
+            }
+            }
         >
           CANCELED
           <InfoSvg />
         </div>
       </div>
       {ULogged?.is_reviewer === true && reviewData?.length > 0 ? (
-            <>
+            <div style={{minHeight:"52.5vh"}}>
       <table className="table">
         <thead>
           <tr>
@@ -320,7 +334,7 @@ const ReviewMainPage = () => {
                           {" "}
                           <td>
                             <span className="badge badge-warning">
-                              Hold
+                              Pending
                             </span>
                           </td>
                         </>
@@ -430,29 +444,25 @@ const ReviewMainPage = () => {
        
 
       </table>
-      </>)
+      </div>)
            : (
             <h3 className="text-center">No Documents yet</h3>
           )}
      
         <div className="d-flex justify-content-center">
-          <button className="btn customDC-color m-2" onClick={prevPage}>
+          {showNextButton === true ? <>
+            <button className="btn customDC-color m-2" onClick={prevPage}>
             Previous Page
-          </button>
+          </button></>:""}
+        {showPrevButton=== true ? <>
           <button className="btn customDC-color m-2" onClick={nextPage}>
             Next Page
-          </button>
+          </button></>:""}
+         
         </div>
     
 
-      {/* <div className='sam'>
-    <p>Showing 1 of 6 results</p>
-    </div>  
-
-
-  <div className='sahil'>
- <button type="button" className="btn btn-primary">LOAD MORE</button>
- </div> */}
+     
     </div>
   );
 };

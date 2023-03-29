@@ -1,6 +1,6 @@
 import React from "react";
 import { LoaderStatus } from "../../../Common/LoaderReducer/LoaderSlice";
-import { DeliverablesDetails } from "../AssignedProjectsReducer/Deliverables";
+import { DeliverablesDetails } from "../EngineerReducers/Deliverables";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -8,8 +8,8 @@ import { useEffect } from "react";
 import Cookies from 'universal-cookie'
 import LoginDetails from "../../../Login/LoginReducer/LoginSlice"
 import { useState } from "react";
-import { Reports } from "../AssignedProjectsReducer/ReportDetails";
-import { ProjectNumber } from "../AssignedProjectsReducer/ProjectNumber";
+import { Reports } from "../EngineerReducers/ReportDetails";
+import { ProjectNumber } from "../EngineerReducers/ProjectNumber";
 import BACKEND_URL from "../../../../backendUrl";
 
 export const Correspondence = () => {
@@ -26,28 +26,39 @@ export const Correspondence = () => {
   const cookies = new Cookies()
   const CorrespondentsData = useSelector((state) => state.Deliverables.value);
   const ProjectNumberRedux = useSelector((state) => state.ProjectNumberDetails.value.project_number);
+  const [showNextButton, setShowNextButton] = useState(true)
+  const [showPrevButton, setShowPrevButton] = useState(true)
+  const [offset, setOffset] = useState(0)
 
 
-  const nextPage = ()=>{
-    let max = Math.ceil(CorrespondentsData?.reports?.length/4)
-    // console.log("Max", max)
-    if(arrayPageState<max){
-
-      setArrayPageState(arrayPageState+1)
+  const nextPage = () => {
+    
+    if(CorrespondentsData?.reports.length >=8){
+      // console.log("inside nextpage function")
+      let newOffset = offset+8
+      setOffset(newOffset)
+      getCorrespondence(newOffset)
     }
-  }
-  const prevPage = ()=>{
-    if(arrayPageState>1){
+  
+    };
+    const prevPage = () => {
+      // console.log("inside prevpage function")
 
-      setArrayPageState(arrayPageState-1)
-    }
-  }
+     if(offset>=8){
+      let newOffset = offset-8
+      setOffset(newOffset)
+      getCorrespondence(newOffset)
+  
+     }
+    };
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
   myHeaders.append("Access-Control-Allow-Origin", "http://localhost:8081");
   myHeaders.append("Access-Control-Allow-Credentials", true);
 
-const getCorrespondence = ()=>{
+const getCorrespondence = (newOffset)=>{
+  // console.log("newoffset check before sending", newOffset)
+
   let SelectedProject = JSON.parse(localStorage.getItem("SelectedProject"))
 
   if(ProjectNumberRedux !== undefined || SelectedProject != undefined){
@@ -70,12 +81,29 @@ const getCorrespondence = ()=>{
     credentials: "include",
     withCredentials: true,
     params: {
-      screenId: 12,
+      "offset": newOffset || 0,
+      "limit":  8,
+      "screenId": 12
     },
   })
     .then(function (response) {
       // console.log("Response in Correspondents", response.data);
+      let tempOffset
+      if(newOffset!= undefined){
+        tempOffset = newOffset
+      }
+      else{
+        tempOffset = offset
+      }
       if (response?.data?.data?.project) {
+        if(response.data.data?.reports.length<8 && tempOffset==0){
+          setShowNextButton(false)
+          setShowPrevButton(false)
+        }
+        else{
+          setShowNextButton(true)
+          setShowPrevButton(true)
+        }
         dispatch(DeliverablesDetails(response?.data?.data));
         localStorage.setItem("PrevProjectNumber", JSON.stringify(response?.data?.data?.project?.project_number))
         dispatch(LoaderStatus(false));
@@ -110,18 +138,17 @@ useEffect(()=>{
 
 
   useEffect(() => {
+    setOffset(0)
     let SelectedProject = JSON.parse(localStorage.getItem("SelectedProject"))
 
-    // let project_name = JSON.parse(localStorage.getItem("ProjectName"))
-    if(!CorrespondentsData?.project){
    
-      getCorrespondence()
-    }
-    if(!CorrespondentsData?.project?.project_name && SelectedProject != undefined){
+    if(SelectedProject != undefined){
       dispatch(ProjectNumber(SelectedProject))
-      getCorrespondence() 
-
+    
     }
+
+      getCorrespondence()
+    
   
   }, []);
   return (
@@ -186,14 +213,14 @@ useEffect(()=>{
       <table className="table customTableMArgin">
         <thead>
           <tr>
-            <th scope="col" style={{minWidth:"110px"}}>Date created</th>
-            <th scope="col" style={{minWidth:"110px"}}>Record Name</th>
-            <th scope="col" style={{minWidth:"110px"}}>Record Type</th>
-            <th scope="col" style={{minWidth:"110px"}}>Project Number</th>
-            <th scope="col" style={{minWidth:"110px"}}>Project Name</th>
-            <th scope="col" style={{minWidth:"110px"}}>Description</th>
-            <th scope="col" style={{minWidth:"110px"}}>Responsibility</th>
-            <th scope="col" style={{minWidth:"110px"}}>Work Order</th>
+            <th scope="col" className="tableColumnsSize">Date created</th>
+            <th scope="col" className="tableColumnsSize">Record Name</th>
+            <th scope="col" className="tableColumnsSize">Record Type</th>
+            <th scope="col" className="tableColumnsSize">Project Number</th>
+            <th scope="col" className="tableColumnsSize">Project Name</th>
+            <th scope="col" className="tableColumnsSize">Description</th>
+            <th scope="col" className="tableColumnsSize">Responsibility</th>
+            <th scope="col" className="tableColumnsSize">Work Order</th>
             <th scope="col"style={{minWidth:"140px"}}></th>
           </tr>
         </thead>
@@ -201,17 +228,17 @@ useEffect(()=>{
         <tbody>
           {CorrespondentsData?.project && CorrespondentsData?.reports ? (
             <>
-              {CorrespondentsData?.reports.slice((arrayPageState-1)*4,arrayPageState*4).map((data) => {
+              {CorrespondentsData?.reports.map((data) => {
                 return (
                   <tr key={data?.file_id}>
-                    <th><b>{data?.report_created_at.slice(0,10)}</b></th>
-                    <td>{data?.original_file_name}</td>
-                    <td>{data?.file_type}</td>
-                    <td>{CorrespondentsData?.project?.project_number}</td>
-                    <td>{CorrespondentsData?.project?.project_name}</td>
-                    <td>{CorrespondentsData?.project?.description}</td>
-                    <td>{data?.reviewer_id}</td>
-                    <td>{data?.tags}</td>
+                    <th className="tableColumnsSize"><b>{data?.report_created_at.slice(0,10)}</b></th>
+                    <td className="tableColumnsSize">{data?.original_file_name}</td>
+                    <td className="tableColumnsSize">{data?.file_sub_type}</td>
+                    <td className="tableColumnsSize">{CorrespondentsData?.project?.project_number}</td>
+                    <td className="tableColumnsSize">{CorrespondentsData?.project?.project_name}</td>
+                    <td className="tableColumnsSize">{CorrespondentsData?.project?.description}</td>
+                    <td className="tableColumnsSize">{data?.reviewer_id}</td>
+                    <td className="tableColumnsSize">{data?.tags}</td>
                     <td>
                       <svg
                         className="m-1"
@@ -224,7 +251,7 @@ useEffect(()=>{
                       onClick={()=>{
                         
                         window.open(
-                          `http://localhost:8081/report/download/${data?.file_id}`
+                          `${BACKEND_URL}/report/download/${data?.file_id}`
                         )
                          
                     }}
@@ -386,10 +413,17 @@ useEffect(()=>{
           )}
         </tbody>
       </table>
-      {CorrespondentsData?.reports?.length>4 ? <div className='d-flex justify-content-center'>
-      <button className='btn m-2 customDC-color' onClick={prevPage}>Previous Page</button>
-      <button className='btn m-2 customDC-color' onClick={nextPage}>Next Page</button>
-      </div>:""}  
+      <div className="d-flex justify-content-center">
+          {showNextButton === true ? <>
+            <button className="btn customDC-color m-2" onClick={prevPage}>
+            Previous Page
+          </button></>:""}
+        {showPrevButton=== true ? <>
+          <button className="btn customDC-color m-2" onClick={nextPage}>
+            Next Page
+          </button></>:""}
+         
+        </div>
     </div>
   );
 };

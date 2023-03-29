@@ -6,7 +6,8 @@ import "./AssignedProjects.css"
 import { NavLink, useNavigate } from 'react-router-dom';
 import debounce from 'debounce'
 import BACKEND_URL from '../../../backendUrl';
-import { ProjectNumber } from './AssignedProjectsReducer/ProjectNumber';
+import { ProjectNumber } from './EngineerReducers/ProjectNumber';
+
 
 const CreateProjectFolder = () => {
   const { register, handleSubmit,getValues , trigger, formState: { errors }} = useForm();
@@ -208,6 +209,7 @@ const CreateProjectFolder = () => {
                
               });
             }, 800)}
+            autocomplete="off"
             ></input>
              {errors.transacting_customer && <span style={{color:"red"}}>This field is required</span>}
             <div className='searchResultsContainer'>
@@ -269,6 +271,7 @@ const CreateProjectFolder = () => {
                
               });
             }, 800)}
+            autocomplete="off"
             ></input>
              {errors.receiving_customer && <span style={{color:"red"}}>This field is required</span>}
             <div className='searchResultsContainer'>
@@ -288,7 +291,7 @@ const CreateProjectFolder = () => {
           }</div>:""}
           </div>
             </div>
-            <button className="btn btn-dark createProjectFolderBoxBorder" onClick={(e)=>{e.preventDefault()
+            <button className="btn btn-dark createProjectFolderBoxBorder" style={{height:"fit-content"}} onClick={(e)=>{e.preventDefault()
             // console.log("Find custmer clcik")
             }}>Find Customer</button>
             </div> </div>          
@@ -313,7 +316,7 @@ const CreateProjectFolder = () => {
           <div classanme="lefttb7">
             <section>*Purchase Order Number</section>
             <div className='w1'>
-            <input className='createProjectFolderBoxBorder' type="Text" placeholder="Enter Purchase order number"  {...register("purchase_order_number",{ minLength:2 })}></input>
+            <input className='createProjectFolderBoxBorder' type="Text" placeholder="Enter Purchase order number"  {...register("purchase_order_number",{required:true, minLength:2 })}></input>
             {errors.purchase_order_number && <span style={{color:"red"}}>This field is required</span>}
           </div></div>
 
@@ -334,7 +337,7 @@ const CreateProjectFolder = () => {
           <div className="righttb2">
             <section>*Models</section></div>
             <div className='models'>
-            <textarea className='createProjectFolderBoxBorder' type="Text"  {...register("modals",)}></textarea>
+            <textarea className='createProjectFolderBoxBorder' type="Text"  {...register("modals",{ required:true})}></textarea>
             {errors.modals && <span style={{color:"red"}}>This field is required</span>}
           </div>
 
@@ -356,13 +359,16 @@ const CreateProjectFolder = () => {
 
 
           <div className="w3">
-            <input className='createProjectFolderBoxBorder' type="date" {...register("client_ready",)} ></input>
-            {errors.client_ready && <span style={{color:"red"}}>This field is required</span>}
+            <input className='createProjectFolderBoxBorder custsession-date' type="date" {...register("client_ready",{required:true})} ></input>
+       
             <div className="w4">
-            <input className='createProjectFolderBoxBorder' type="date" {...register("completion",)}  ></input>
-            {errors.completion && <span style={{color:"red"}}>This field is required</span>}
-          </div></div>
-
+            <input className='createProjectFolderBoxBorder custsession-date' type="date" {...register("completion",{required:true})}   ></input>
+          
+          </div>
+          
+          </div>
+          {errors.client_ready && <span style={{color:"red"}}>This field is required</span>}
+            {errors.completion && <span style={{color:"red",marginLeft:"7rem"}}>This field is required</span>}
 
           
           <div className="righttb5"> 
@@ -372,11 +378,11 @@ const CreateProjectFolder = () => {
             <section>*Date Project Ends</section></div></div>
 
             
-          <div className="w3">
-          <input className='createProjectFolderBoxBorder' type="Date" {...register("start_date",{required:true})} ></input>
+          <div className="w3 ">
+          <input className='createProjectFolderBoxBorder custsession-date' type="Date" {...register("start_date",{required:true})} ></input>
           
             <div className="w4">
-            <input className='createProjectFolderBoxBorder' type="Date" {...register("end_date",{required:true})} ></input>
+            <input className='createProjectFolderBoxBorder custsession-date' type="Date" {...register("end_date",{required:true})} ></input>
           </div></div>
             {errors.start_date && <span style={{color:"red"}}>This field is required</span>}
             {errors.end_date && <span style={{color:"red",marginLeft:"7rem"}}>This field is required</span>}

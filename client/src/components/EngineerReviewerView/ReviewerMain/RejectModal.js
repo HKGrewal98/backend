@@ -1,7 +1,7 @@
 import React from 'react'
 import BACKEND_URL from '../../../backendUrl';
 import { LoaderStatus } from '../../Common/LoaderReducer/LoaderSlice';
-import { Reports } from '../AssignedProjects/AssignedProjectsReducer/ReportDetails';
+import { Reports } from '../EngineerMain/EngineerReducers/ReportDetails';
 import { useForm, SubmitHandler } from "react-hook-form";
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';

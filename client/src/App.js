@@ -9,18 +9,18 @@ import { Login } from "./components/Login/Login";
 import { Footer } from "./components/Common/Footer/Footer";
 import { ComplianceCentralUsers } from "./components/ComplianceCentralUsers/ComplianceCentralUsers";
 import { LandingPage } from "./components/EngineerReviewerView/LandingPage/LandingPage";
-import CreateProjectFolder from "./components/EngineerReviewerView/AssignedProjects/CreateProjectFolder";
+import CreateProjectFolder from "./components/EngineerReviewerView/EngineerMain/CreateProjectFolder";
 
 import { NewReport } from "./components//EngineerReviewerView/Reports/NewReport";
 
-import { AssignedProjectMain } from "./components/EngineerReviewerView/AssignedProjects/AssignedProjectMain";
-import { Deliverables } from "./components/EngineerReviewerView/AssignedProjects/Deliverables/Deliverables";
-import {Details } from "./components/EngineerReviewerView/AssignedProjects/Details/Details";
-import {Financials } from "./components/EngineerReviewerView/AssignedProjects/Financials/Financials";
-import {SupportingDocuments } from "./components/EngineerReviewerView/AssignedProjects/SupportingDocuments/SupportingDocuments";
-import {Correspondence } from "./components/EngineerReviewerView/AssignedProjects/Correspondence/Correspondence";
-import {EquipmentLog } from "./components/EngineerReviewerView/AssignedProjects/EquipmentLog/EquipmentLog";
-import {Sample } from "./components/EngineerReviewerView/AssignedProjects/Sample/Sample";
+import { AssignedProjectMain } from "./components/EngineerReviewerView/EngineerMain/EngineerMainPage";
+import { Deliverables } from "./components/EngineerReviewerView/EngineerMain/Deliverables/Deliverables";
+import {Details } from "./components/EngineerReviewerView/EngineerMain/Details/Details";
+import {Financials } from "./components/EngineerReviewerView/EngineerMain/Financials/Financials";
+import {SupportingDocuments } from "./components/EngineerReviewerView/EngineerMain/SupportingDocuments/SupportingDocuments";
+import {Correspondence } from "./components/EngineerReviewerView/EngineerMain/Correspondence/Correspondence";
+import {EquipmentLog } from "./components/EngineerReviewerView/EngineerMain/EquipmentLog/EquipmentLog";
+import {Sample } from "./components/EngineerReviewerView/EngineerMain/Sample/Sample";
 import ReviewMainPage from "./components/EngineerReviewerView/ReviewerMain/ReviewMainPage";
 import ViewReportsScreen from "./components/EngineerReviewerView/Reports/ViewReportsScreen";
 import { useSelector } from "react-redux";
@@ -63,7 +63,7 @@ function App() {
         <Route  path="equipmentLog" element={<EquipmentLog />}/>
         <Route  path="sample" element={<Sample />}/>
         </Route>
-        <Route path="view/assignedProjects/newReport" element={<NewReport />} />
+        <Route path="view/newReport" element={<NewReport />} />
         <Route path="view/viewReport" element={<ViewReportsScreen />} />
         <Route path="view/editReport" element={<EditReportScreen />} />
 
