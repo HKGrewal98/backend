@@ -69,7 +69,7 @@ const ReviewMainPage = () => {
     })
       .then((res) => {
         dispatch(LoaderStatus(false));
-        //  console.log("response ", res.data)
+         console.log("response ", res.data)
         if (res?.data?.data) {
           if(res.data.data.length<8 && offset==0){
             setShowNextButton(false)

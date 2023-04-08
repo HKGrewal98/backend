@@ -31,7 +31,8 @@ export const SupportingDocuments = () => {
   const SupportingDocumentsData = useSelector(
     (state) => state.Deliverables.value
   );
-  const ProjectNumberRedux = useSelector((state) => state.ProjectNumberDetails.value.project_number);
+  // const ProjectNumberRedux = useSelector((state) => state.ProjectNumberDetails.value?.project_number);
+  const ProjectNumberRedux = useSelector((state) => state.ProjectNumberDetails && state.ProjectNumberDetails.value && state.ProjectNumberDetails.value.project_number);
 
   const [offset, setOffset] = useState(0)
 
@@ -128,7 +129,11 @@ export const SupportingDocuments = () => {
   
   useEffect(() => {
     setOffset(0)
-    let SelectedProject = JSON.parse(localStorage.getItem("SelectedProject"))
+    let SelectedProject
+   if (localStorage.getItem("SelectedProject")) {
+    SelectedProject = JSON.parse(localStorage.getItem("SelectedProject"));
+   
+  }
 
    
     if(SelectedProject != undefined){
@@ -142,15 +147,15 @@ export const SupportingDocuments = () => {
   return (
     <div>
          {showModalDeleteDoc === true ? <>
-      <div id="myCustomModal" class="customModal">
-<div class="custom-modal-content" >
-  <div class="custom-modal-header customDC-color pt-2" >
+      <div id="myCustomModal" className="customModal">
+<div className="custom-modal-content" >
+  <div className="custom-modal-header customDC-color pt-2" >
    
     <h4 className='text-center '>Are you sure you want to delete the document?</h4>
   </div>
  
  
-  <div class="custom-modal-footer d-flex justify-content-end ">
+  <div className="custom-modal-footer d-flex justify-content-end ">
   <button className="btn customDC-color m-2"  onClick={()=>{
          axios({
           method: 'put',

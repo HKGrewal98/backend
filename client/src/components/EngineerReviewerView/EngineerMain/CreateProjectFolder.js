@@ -10,7 +10,7 @@ import { ProjectNumber } from './EngineerReducers/ProjectNumber';
 
 
 const CreateProjectFolder = () => {
-  const { register, handleSubmit,getValues , trigger, formState: { errors }} = useForm();
+  const { register, handleSubmit,getValues , trigger, setError, formState: { errors }} = useForm();
   const [showModalGreen, setShowModalGreen] = useState(false)
   const [showModalRed, setShowModalRed] = useState(false)
   const [modalRedMessage, setModalRedMessage] = useState()
@@ -22,13 +22,28 @@ const CreateProjectFolder = () => {
   const dispatch = useDispatch()
   // const watchFields = watch(["showAge", "number"])
   const onSubmit= ((data) => {
-    // console.log(data)
+    if(Date.parse(data?.client_ready) > Date.parse(data?.completion)){
+      setError("completion", {
+        type: "Date",
+        message: "Completion Date Should be greater than start date client ready"
+    });
+    return
+    }
+
+    if(Date.parse(data?.start_date) > Date.parse(data?.end_date)){
+      setError("end_date", {
+        type: "Date",
+        message: "End Date Should be greater than start date"
+    });
+    return
+    }
+  
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append('Access-Control-Allow-Origin', 'http://localhost:8081')
     myHeaders.append('Access-Control-Allow-Credentials', true)
     
-   
+    
     
     axios({
       method: 'post',
@@ -40,7 +55,7 @@ const CreateProjectFolder = () => {
         withCredentials:true,
     })
     .then(function (response) {
-      // console.log(JSON.stringify(response.data));
+      console.log(JSON.stringify(response.data));
       if(response.data.statusCode===200){
         setShowModalGreen(true)
         setProjectCreatedData({"project_number":response.data?.data?.id,"project_name":data.project_name})
@@ -50,6 +65,10 @@ const CreateProjectFolder = () => {
         setShowModalRed(true)
         setModalRedMessage(response.data?.message)
         navigate('/')
+      }
+      if(response?.data?.message =="Dates are invalid. Start date must be smaller than end date / completion date."){
+        setShowModalRed(true)
+      setModalRedMessage(response.data.message)
       }
      
     })
@@ -72,13 +91,13 @@ const CreateProjectFolder = () => {
 
     <>
     {showModalGreen===true ? <>
-      <div id="myCustomModal" class="customModal">
-<div class="custom-modal-content">
-  <div class="custom-modal-header">
+      <div id="myCustomModal" className="customModal">
+<div className="custom-modal-content">
+  <div className="custom-modal-header">
    
     <h4 className='text-center'>Your Project is ready</h4>
   </div>
-  <div class="custom-modal-body">
+  <div className="custom-modal-body">
     <div className='customContent d-flex align-items-center'>
     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M28.6802 -0.000244141C35.4602 -0.000244141 40.0002 4.75976 40.0002 11.8398V28.1818C40.0002 35.2398 35.4602 39.9998 28.6802 39.9998H11.3402C4.56021 39.9998 0.000213623 35.2398 0.000213623 28.1818V11.8398C0.000213623 4.75976 4.56021 -0.000244141 11.3402 -0.000244141H28.6802ZM28.3602 13.9998C27.6802 13.3198 26.5602 13.3198 25.8802 13.9998L17.6202 22.2598L14.1202 18.7598C13.4402 18.0798 12.3202 18.0798 11.6402 18.7598C10.9602 19.4398 10.9602 20.5398 11.6402 21.2398L16.4002 25.9798C16.7402 26.3198 17.1802 26.4798 17.6202 26.4798C18.0802 26.4798 18.5202 26.3198 18.8602 25.9798L28.3602 16.4798C29.0402 15.7998 29.0402 14.6998 28.3602 13.9998Z" fill="#008000"/>
@@ -87,7 +106,7 @@ const CreateProjectFolder = () => {
 </div>
    
   </div>
-  <div class="custom-modal-footer d-flex justify-content-end ">
+  <div className="custom-modal-footer d-flex justify-content-end ">
     <button className='btn m-2' style={{backgroundColor:"#60CD8A", color:"white"}} onClick={()=>{
       localStorage.setItem("SelectedProject", JSON.stringify(ProjectCreatedData)) 
       dispatch(ProjectNumber(ProjectCreatedData))
@@ -100,20 +119,20 @@ const CreateProjectFolder = () => {
 
     </>:""}
     {showModalRed === true ? <>
-      <div id="myCustomModal" class="customModal">
-<div class="custom-modal-content" >
-  <div class="custom-modal-header"  style={{backgroundColor:"#ff4646"}}>
+      <div id="myCustomModal" className="customModal">
+<div className="custom-modal-content" >
+  <div className="custom-modal-header"  style={{backgroundColor:"#ff4646"}}>
    
     <h4 className='text-center'>Error</h4>
   </div>
-  <div class="custom-modal-body">
+  <div className="custom-modal-body">
     <div className='customContent d-flex align-items-center'  style={{backgroundColor:"#ff4646" , border:"0", color:"white"}}>
   
 <div className='ml-2'>{modalRedMessage}</div>
 </div>
    
   </div>
-  <div class="custom-modal-footer d-flex justify-content-end ">
+  <div className="custom-modal-footer d-flex justify-content-end ">
     <button className='btn m-2' style={{backgroundColor:"#ff4646", color:"white"}} onClick={()=>{
        
       setShowModalRed(false)}}>Close</button>
@@ -195,7 +214,7 @@ const CreateProjectFolder = () => {
               })
               .then(function (response) {
                 // console.log(response.data);
-                if(response.data?.data.length>0){
+                if(response.data?.data?.length>0){
 
                   setSearchResults(response.data?.data)
                 }
@@ -257,7 +276,7 @@ const CreateProjectFolder = () => {
               })
               .then(function (response) {
                 // console.log(response.data);
-                if(response.data?.data.length>0){
+                if(response.data?.data?.length>0){
 
                   setSearchResults1(response.data?.data)
                 }
@@ -316,7 +335,7 @@ const CreateProjectFolder = () => {
           <div classanme="lefttb7">
             <section>*Purchase Order Number</section>
             <div className='w1'>
-            <input className='createProjectFolderBoxBorder' type="Text" placeholder="Enter Purchase order number"  {...register("purchase_order_number",{required:true, minLength:2 })}></input>
+            <input className='createProjectFolderBoxBorder' type="Text" placeholder="Enter Purchase order number"  {...register("purchase_order_number",{required:true})}></input>
             {errors.purchase_order_number && <span style={{color:"red"}}>This field is required</span>}
           </div></div>
 
@@ -350,44 +369,63 @@ const CreateProjectFolder = () => {
 
         
 
-        
-          <div className="righttb4">
+        <div className='d-flex w-100'>
+          <div className="right" style={{width:"45%"}}>
           <section>*Date Client Ready</section>
-          <div className='moveright2'>
-          <section>*Date Promised Complete</section></div></div>
-
-
-
-          <div className="w3">
+          <div className="w">
+            <div className=''>
             <input className='createProjectFolderBoxBorder custsession-date' type="date" {...register("client_ready",{required:true})} ></input>
-       
-            <div className="w4">
+            </div>
+            {errors.client_ready && <div style={{color:"red"}}>This field is required</div>}
+            </div>
+            </div>
+          <div className='moverig' style={{width:"45%"}}>
+          <section>*Date Promised Complete</section>
+          <div className="w">
+            <div className=''>
             <input className='createProjectFolderBoxBorder custsession-date' type="date" {...register("completion",{required:true})}   ></input>
-          
-          </div>
-          
-          </div>
-          {errors.client_ready && <span style={{color:"red"}}>This field is required</span>}
-            {errors.completion && <span style={{color:"red",marginLeft:"7rem"}}>This field is required</span>}
+            </div>
+            {errors.completion && <div style={{color:"red"}}>{ errors?.completion?.message ||"This field is required"}</div>}
 
+          </div>
           
-          <div className="righttb5"> 
+          </div>
+
+</div>
+
+      
+         
+          
+        
+        <div className='d-flex'> 
+          
+          <div className="right" style={{width:"45%"}}> 
             <section>*Date Project Starts</section>
-            
-            <div className='moveright3'>
-            <section>*Date Project Ends</section></div></div>
-
-            
-          <div className="w3 ">
+            <div className="w ">
+              <div className=''>
           <input className='createProjectFolderBoxBorder custsession-date' type="Date" {...register("start_date",{required:true})} ></input>
-          
-            <div className="w4">
+          </div>
+          {errors.start_date && <div style={{color:"red"}}>This field is required</div>}</div>
+          </div>
+            <div className='moverig' style={{width:"45%"}}>
+              
+            <section>*Date Project Ends</section>
+            <div className="w">
+              <div className=''>
             <input className='createProjectFolderBoxBorder custsession-date' type="Date" {...register("end_date",{required:true})} ></input>
-          </div></div>
-            {errors.start_date && <span style={{color:"red"}}>This field is required</span>}
-            {errors.end_date && <span style={{color:"red",marginLeft:"7rem"}}>This field is required</span>}
+            </div>
+            {errors.end_date && <div style={{color:"red"}}>{errors?.end_date?.message  ||"This field is required"}</div>}
 
 
+          </div>
+            </div>
+
+
+           
+            </div>
+        
+          
+         
 
 
         </div>

@@ -169,7 +169,7 @@ const ViewReportsScreen = () => {
 
 <div className='Reportsstandards' style={{maxWidth:"600px" , maxHeight:"350px", overflow:"auto"}}>
 <section>Report Standards</section> 
-<table class="table" style={{margin:"0", backgroundColor:"white", borderBottom:"0",width:"600px",marginTop: "0"}}>
+<table className="table" style={{margin:"0", backgroundColor:"white", borderBottom:"0",width:"600px",marginTop: "0"}}>
   <thead>
     <tr>
       <th scope="col" >Type</th>
@@ -274,7 +274,7 @@ const ViewReportsScreen = () => {
 
                       <span onClick={() => {
                           window.open(
-                            `http://localhost:8081/report/download/${report?.file_id}`
+                            `${BACKEND_URL}/report/download/${report?.file_id}`
                           );
                         }}>
                           <DownloadSvg />

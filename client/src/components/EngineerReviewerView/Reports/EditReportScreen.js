@@ -253,12 +253,12 @@ const EditReportScreen = () => {
       )}
       {showModalUpdateDoc === true ? (
         <>
-          <div id="myCustomModal" class="customModal">
-            <div class="custom-modal-content">
-              <div class="custom-modal-header customDC-color pt-2">
+          <div id="myCustomModal" className="customModal">
+            <div className="custom-modal-content">
+              <div className="custom-modal-header customDC-color pt-2">
                 <h4 className="text-center ">Update Document</h4>
               </div>
-              <div class="custom-modal-body">
+              <div className="custom-modal-body">
                 <input
                   className=""
                   type="file"
@@ -269,7 +269,7 @@ const EditReportScreen = () => {
             <div style={{ color: "red" }}> {errors.file?.message}</div>
           )}
               </div>
-              <div class="custom-modal-footer d-flex justify-content-end ">
+              <div className="custom-modal-footer d-flex justify-content-end ">
                 <button
                   className="btn customDC-color m-2"
                   onClick={handleSubmit(onSubmit)}
@@ -293,12 +293,12 @@ const EditReportScreen = () => {
       )}
         {showModalAdditionalDoc === true ? (
         <>
-          <div id="myCustomModal" class="customModal">
-            <div class="custom-modal-content">
-              <div class="custom-modal-header customDC-color pt-2">
+          <div id="myCustomModal" className="customModal">
+            <div className="custom-modal-content">
+              <div className="custom-modal-header customDC-color pt-2">
                 <h4 className="text-center ">Add New Document</h4>
               </div>
-              <div class="custom-modal-body">
+              <div className="custom-modal-body">
                 <input
                   className=""
                   type="file"
@@ -309,7 +309,7 @@ const EditReportScreen = () => {
             <div style={{ color: "red" }}> {errors.file?.message}</div>
           )}
               </div>
-              <div class="custom-modal-footer d-flex justify-content-end ">
+              <div className="custom-modal-footer d-flex justify-content-end ">
                 <button
                   className="btn customDC-color m-2"
                   onClick={handleSubmit(onSubmit)}
@@ -333,18 +333,18 @@ const EditReportScreen = () => {
       )}
       {showModalDeleteDoc === true ? (
         <>
-          <div id="myCustomModal" class="customModal">
-            <div class="custom-modal-content">
-              <div class="custom-modal-header customDC-color pt-2">
+          <div id="myCustomModal" className="customModal">
+            <div className="custom-modal-content">
+              <div className="custom-modal-header customDC-color pt-2">
                 <h4 className="text-center ">
                   Are you sure you want to delete the document?
                 </h4>
               </div>
-              <div class="custom-modal-body">
+              <div className="custom-modal-body">
                 {reportDataForModal?.original_file_name}
               </div>
 
-              <div class="custom-modal-footer d-flex justify-content-end ">
+              <div className="custom-modal-footer d-flex justify-content-end ">
                 <button
                   className="btn customDC-color m-2"
                   onClick={() => {
@@ -562,7 +562,7 @@ const EditReportScreen = () => {
 
                       <span onClick={() => {
                           window.open(
-                            `http://localhost:8081/report/download/${report?.file_id}`
+                            `${BACKEND_URL}/report/download/${report?.file_id}`
                           );
                         }}>
                           <DownloadSvg />

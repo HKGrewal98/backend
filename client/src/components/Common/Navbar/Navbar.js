@@ -62,8 +62,11 @@ export const Navbar = () => {
     }
     if(res.status === 401){
       cookies.remove('connect.sid')
-          dispatch(LoginDetails({}))
+      if(ULogged?.is_engineer || ULogged?.is_reviewer){
+        dispatch(LoginDetails({}))
          localStorage.setItem("AlertMessage", JSON.stringify("Session Expired...Please Login Again"))
+      }
+          
       navigate('/')
     }
   }).catch(err=>{

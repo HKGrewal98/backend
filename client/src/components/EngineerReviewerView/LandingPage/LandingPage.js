@@ -125,7 +125,8 @@ export const LandingPage = () => {
       className="modal show "
       style={{ display: 'block', position: 'absolute' }}
     >
-      <Modal show={show} onHide={handleClose} backdrop="static">
+      <Modal  show={show} onHide={handleClose} backdrop="static">
+      <div  className="searchModal">
         <Modal.Header>
           <Modal.Title>Search Results</Modal.Title>
         </Modal.Header>
@@ -136,8 +137,8 @@ export const LandingPage = () => {
             <div className="d-flex resultCs" onClick={()=>{
               showProject(data)
             }}>
-            <p className="mr-3"><b>Project Name</b> : {data?.project_name}</p>
-            <p><b>Project Number</b> : {data?.project_number}</p>
+            <p className="m-2 mr-3"><b>Project Name</b> : {data?.project_name}</p>
+            <p className="m-2"><b>Project Number</b> : {data?.project_number}</p>
             </div>
             
             </div>
@@ -150,7 +151,9 @@ export const LandingPage = () => {
           </Button>
         
         </Modal.Footer>
+        </div>
       </Modal>
+      
       </div>
     </>:""}
     <div className="homeBar">

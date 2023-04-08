@@ -67,12 +67,12 @@ export const ApproveModal = (props) => {
     
   });
   return (
-    <div id="myCustomModal" class="customModal">
-    <div class="custom-modal-content">
-      <div class="custom-modal-header bg-success">
+    <div id="myCustomModal" className="customModal">
+    <div className="custom-modal-content">
+      <div className="custom-modal-header bg-success">
         <h4 className="text-start p-2">Approve Review</h4>
       </div>
-      <div class="custom-modal-body">
+      <div className="custom-modal-body">
         <div
           className="align-items-center mt-2"
           style={{
@@ -226,7 +226,7 @@ export const ApproveModal = (props) => {
           ></textarea>
         </div>
       </div>
-      <div class="custom-modal-footer d-flex justify-content-end ">
+      <div className="custom-modal-footer d-flex justify-content-end ">
         <button className="btn btn-success m-2" onClick={
           handleSubmit(onSubmit)
         }>

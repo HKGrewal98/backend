@@ -68,12 +68,12 @@ export const RejectModal = (props) => {
     
   });
   return (
-    <div id="myCustomModal" class="customModal">
-            <div class="custom-modal-content">
-              <div class="custom-modal-header bg-danger">
+    <div id="myCustomModal" className="customModal">
+            <div className="custom-modal-content">
+              <div className="custom-modal-header bg-danger">
                 <h4 className="text-start">Reject Review</h4>
               </div>
-              <div class="custom-modal-body">
+              <div className="custom-modal-body">
                 <textarea
                   className="w-100 m-1 "
                   {...register("comment")}
@@ -86,7 +86,7 @@ export const RejectModal = (props) => {
                 />
                 *Comments
               </div>
-              <div class="custom-modal-footer d-flex justify-content-end ">
+              <div className="custom-modal-footer d-flex justify-content-end ">
                 <button className="btn m-2 btn-danger" onClick={()=>onSubmit(handleSubmit)}>
                   Reject Review
                 </button>

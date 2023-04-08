@@ -22,6 +22,9 @@ export const EditReportChildContent = (props) => {
   const { register, handleSubmit,getValues , trigger, formState: { errors }} = useForm();
   const[searchResults, setSearchResults] = useState([])
   const[searchResults1, setSearchResults1] = useState([])
+  const[searchResults2, setSearchResults2] = useState([])
+  const [ProjectCreatedData, setProjectCreatedData] = useState()
+
 
   const cookies = new Cookies()
   const navigate = useNavigate()
@@ -43,11 +46,12 @@ export const EditReportChildContent = (props) => {
   const  onSubmit= ((fdata) => {
     removeEmptyFields(fdata)
     // console.log(fdata)
-    if(fdata?.project_name){
+    if(fdata?.project_name || fdata?.project_number){
       let newData = {
         "metaInfo": "project_info",
         "data" : {
-          project_name: fdata?.project_name
+          project_name: fdata?.project_name,
+          // project_number: fdata?.project_number
         },
         "where": ReportsDetailsRedux?.report?.report_number
       }
@@ -67,7 +71,7 @@ export const EditReportChildContent = (props) => {
     
   });
   const updateData = async (data)=>{
-    // console.log("sending data", data)
+    console.log("sending data", data)
     dispatch(LoaderStatus(true))
    await axios({
       method: 'post',
@@ -142,14 +146,83 @@ export const EditReportChildContent = (props) => {
      
       <div className="ProjectNumber">
         <section>Project Number <span style={{cursor:"pointer"}} onClick={()=>setInputDisabledState(!inputDisabledState)}><EditSvg /></span></section>
-        <input
+        {/* <input type="text" className="form-control" autoComplete='off' id="projectNumber" 
+   placeholder={ReportsDetailsRedux?.project?.project_number || ReportsDetailsRedux?.report?.project_number}
+  style={{width:"120%",borderTop:"0", borderLeft:"0", borderRight:"0", fontSize:"1rem", borderBottom:"1px solid grey"}}
+  
+   disabled
+ 
+  /> */}
+   <input
           type="text"
-          placeholder={ReportsDetailsRedux?.project?.project_number || ReportsDetailsRedux?.report?.project_number}
+          placeholder={
+            ReportsDetailsRedux?.project?.project_number || ReportsDetailsRedux?.report?.project_number
+          }
+        
           disabled
-          
-        ></input>
-      </div>
 
+        ></input>
+        {/* <div className='parentSearchResult'>
+  <input type="text" className="form-control" autoComplete='off' id="projectNumber" 
+   placeholder={ReportsDetailsRedux?.project?.project_number || ReportsDetailsRedux?.report?.project_number}
+  style={{width:"120%",borderTop:"0", borderLeft:"0", borderRight:"0", fontSize:"1rem", borderBottom:"1px solid grey"}}
+  
+   disabled
+  {...register("project_number")}
+   onChange={debounce(async (e) => {
+    let str = e.target.value
+    // console.log("str check", str)
+    let data={
+      name: str
+    }
+    axios({
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: `${BACKEND_URL}/project`,
+        params : data,
+      
+        credentials: "include", 
+        withCredentials:true,
+    })
+    .then(function (response) {
+      // console.log(response.data);
+      if(response.data?.data.length>0){
+
+        setSearchResults2(response.data?.data)
+      }
+      else{
+        setSearchResults2([])
+      }
+     
+    })
+    .catch(function (error) {
+      console.log("Error block", error);
+     
+    });
+  }, 800)}
+  />
+   {errors.project_number && <span style={{color:"red"}}>This field is required</span>}
+   <div className='searchResultsContainer'>
+            {searchResults2?.length>0? 
+              <div className='searchResults'>
+            {searchResults2?.length>0? searchResults2.map((result,index)=>{
+             
+                
+                return <div key={index} className='searchItem' onClick={()=>{
+                  document.getElementById("projectNumber").value = result.project_number;
+                  document.getElementById("projectNumber").focus();
+                  setProjectCreatedData({"project_number":result?.project_number,"project_name":result?.project_name})
+                  setSearchResults2([])
+                }}>{result?.project_number}- {result?.project_name}</div>
+                
+              
+            }):""
+          }</div>:""}
+          </div>
+</div> */}
+        
+      </div>
+     
       <div className="ReviewType">
         <section>Review Type</section>
         
@@ -168,7 +241,8 @@ export const EditReportChildContent = (props) => {
           disabled
         ></input>
         </>:""}
-        {ReportsDetailsRedux?.documents && ReportsDetailsRedux?.documents[0]?.sub_type ===2 ? <>
+        {ReportsDetailsRedux?.documents && ReportsDetailsRedux?.documents[0]?.sub_type ===2 ? 
+        <>
           <input
           type="text"
           placeholder="Financial"
@@ -411,82 +485,13 @@ export const EditReportChildContent = (props) => {
         ></input>
       </div>
     </div>
-    <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div className="modal-dialog">
-    <div className="modal-content">
-    <div className="modal-header custom_title">
-        <h6 className="modal-title fs-5 custom_title" id="exampleModalLabel">Assign Standards to Review</h6>
-      </div>
-
-      <div className="modal-body">
-      
-
-      {/* ------Navbar */}
-      <div className="container">
-  <nav className="navbar navbar-expand-lg bg-light">
-    <div className="container-fluid">
-     
-      <tr className='d-flex'>
-       <td className={activeStandard === 1 ? 'text-primary':""} style={{fontSize:"0.8rem",padding:"0 1.13rem" , cursor:"pointer"}} onClick={()=>{
-        setSlicedStandards(standards?.slice(0,4))
-        setActiveStandard(1)
-       }}>Assigned</td>
-       <td  className={activeStandard === 2 ? 'text-primary':""} style={{fontSize:"0.8rem",padding:"0 1.13rem" , cursor:"pointer"}} onClick={()=>{
-        setSlicedStandards(standards?.slice(4,8))
-        setActiveStandard(2)
-       }}>Add Lab Standards</td>
-       <td  className={activeStandard === 3 ? 'text-primary':""} style={{fontSize:"0.8rem",padding:"0 1.13rem" , cursor:"pointer"}} onClick={()=>{
-        setActiveStandard(3)
-        setSlicedStandards(standards?.slice(8,12))}
-        }>Add GLobal Standards</td>
-      </tr>
-     
-      
-    </div>
-  </nav>
-</div>
-      <table>
-          <tr>
-            <th> </th>
-            <th> Standard </th>
-            <th> Description </th>
-            </tr>
-            <hr className="report_hr"></hr>
-           
-            {slicedStandards?.length>0 ? slicedStandards?.map((stand)=>{
-              return(
-               <tr className="report_td" key={stand?.id}>
-                <td><input type="checkbox" id="standard1" name="standard1"  {...register(`${stand?.id}`)} ></input></td>
-                <td> {stand?.standard}</td>
-                <td> {stand?.description} </td>
-              </tr>
-              )
-            }):""}
-          
-            <hr className="report_hr"></hr>
-            
-        
-            {/* onClick={()=>alert("Standards added successfully!") */}
-    </table>
-      </div>
-      <div className="modal-footer">
-        <button type="button" className="btn btn-primary modal_btn" data-bs-dismiss="modal" onClick={()=>{}}>ADD STANDARDS TO REVIEW</button>
-        {/* data-bs-dismiss={close?"modal":""}  */}
-        <button type="button" className="btn btn-secondary modal_btn" data-bs-dismiss="modal">CANCEL</button>
-      </div>
-    </div>
-  </div>
-</div>                  
+                 
     <div className="Reportsstandards" style={{maxWidth:"600px" , maxHeight:"350px", overflow:"auto"}}>
       <section>Report Standards
-      {/* {inputDisabledState === false ? <>
-        <label>
-      <div className='reportStandardIcon'  data-bs-toggle="modal" data-bs-target="#exampleModal" >+</div></label>
-   <label className="custom_label1">*Click(+) to edit some Standards</label>
-   </>:""} */}
+    
 
       </section>
-      <table class="table" style={{margin:"0", backgroundColor:"white", borderBottom:"0",width:"600px",marginTop: "0"}}>
+      <table className="table" style={{margin:"0", backgroundColor:"white", borderBottom:"0",width:"600px",marginTop: "0"}}>
   <thead>
     <tr>
       <th scope="col" >Type</th>

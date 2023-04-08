@@ -15,7 +15,8 @@ export const Details = () => {
     const dispatch = useDispatch()
     const cookies = new Cookies()
     const DetailsMain = useSelector((state) => state.Deliverables.value);
-  const ProjectNumberRedux = useSelector((state) => state.ProjectNumberDetails.value.project_number);
+  // const ProjectNumberRedux = useSelector((state) => state.ProjectNumberDetails.value?.project_number);
+  const ProjectNumberRedux = useSelector((state) => state.ProjectNumberDetails && state.ProjectNumberDetails.value && state.ProjectNumberDetails.value.project_number);
 
     
     useEffect(()=>{
@@ -82,7 +83,12 @@ export const Details = () => {
     }
 
     useEffect(()=>{
-    let SelectedProject = JSON.parse(localStorage.getItem("SelectedProject"))
+
+      let SelectedProject
+      if (localStorage.getItem("SelectedProject")) {
+       SelectedProject = JSON.parse(localStorage.getItem("SelectedProject"));
+      
+     }
 
       if(!DetailsMain?.project){
 

@@ -22,7 +22,7 @@ export const NewReport=()=>{
 
  
   const [name,setName] = useState("")
-  const [ProjectCreatedData, setProjectCreatedData] = useState()
+  const [ProjectCreatedData, setProjectCreatedData] = useState({})
 
   
   const [close,setClose] = useState(false)
@@ -82,54 +82,64 @@ export const NewReport=()=>{
   const onSubmit = ((data) => {
   
     let stID = filteredIds(data)
-    // console.log("Filtered ids", stID)
+    console.log("Date", data)
   
     let standardString = stID.toString()
     // console.log(standardString)
-
+  
     // Report validation
     let r = data?.report[0]?.name
     let reportSize = data?.report[0]?.size
     // console.log(certificateSize,"certificateSize")
-    if(reportSize>250000000){
+      // Certificate validation
+      let c = data?.certificate[0]?.name
+      let certificateSize = data?.certificate[0]?.size
+      // console.log(certificateSize,"certificateSize")
+    
+    if(reportSize>250000000 || certificateSize>250000000 ){
+   
+      if(reportSize>250000000){
       setError("report", {
         type: "filetype",
         message: "Size less than 25Mb is allowed"
     });
-    return
-    }
-    const getRExtansion =  r.includes('.') && r.substr(r.lastIndexOf('.') + 1).split(' ')[0]
-    // console.log("extension check", getRExtansion)
-    if((getRExtansion!=="xlsx") && (getRExtansion!=="xls")  && (getRExtansion!=="xlsm")  && (getRExtansion!=="xlsb")  && (getRExtansion!=="doc")  && (getRExtansion!=="docx")){
-
-    setError("report", {
-        type: "filetype",
-        message: "Only Doc, Docx, Xls, Xlsx,Xlsm,Xlsb documents are valid."
-    });
-    return;
-
-    }
-
-    // Certificate validation
-    let c = data?.certificate[0]?.name
-    let certificateSize = data?.certificate[0]?.size
-    // console.log(certificateSize,"certificateSize")
-    if(certificateSize>250000000){
-      setError("certificate", {
-        type: "filetype",
-        message: "Size less than 25Mb is allowed"
-    });
-    return
-    }
-    const getCExtansion =  r.includes('.') && c.substr(c.lastIndexOf('.') + 1).split(' ')[0]
-    // console.log("extension check", getCExtansion)
-    if((getCExtansion!=="xlsx") && (getCExtansion!=="xls")  && (getCExtansion!=="xlsm")  && (getCExtansion!=="xlsb")  && (getCExtansion!=="doc")  && (getCExtansion!=="docx")){
-
+  }
+  if(certificateSize>250000000){
     setError("certificate", {
-        type: "filetype",
-        message: "Only Doc, Docx, Xls, Xlsx,Xlsm,Xlsb documents are valid."
-    });
+      type: "filetype",
+      message: "Size less than 25Mb is allowed"
+  });
+}
+    return
+     }
+     const getRExtansion =  r?.includes('.') && r?.substr(r?.lastIndexOf('.') + 1).split(' ')[0]
+   
+     const getCExtansion =  c?.includes('.') && c?.substr(c?.lastIndexOf('.') + 1).split(' ')[0]
+     // console.log("extension check", getCExtansion)
+   
+    // console.log("extension check", getRExtansion)
+    if(((getRExtansion!=="xlsx") && (getRExtansion!=="xls")  && (getRExtansion!=="xlsm")  && (getRExtansion!=="xlsb")  && (getRExtansion!=="doc")  && (getRExtansion!=="docx"))  ||  (
+      (getCExtansion!=="xlsx") && (getCExtansion!=="xls")  && (getCExtansion!=="xlsm")  && (getCExtansion!=="xlsb")  && (getCExtansion!=="doc")  && (getCExtansion!=="docx")
+    )){
+      if((getRExtansion!=="xlsx") && (getRExtansion!=="xls")  && (getRExtansion!=="xlsm")  && (getRExtansion!=="xlsb")  && (getRExtansion!=="doc")  && (getRExtansion!=="docx")){
+        setError("report", {
+          type: "filetype",
+          message: "Only Doc, Docx, Xls, Xlsx,Xlsm,Xlsb documents are valid."
+      });
+      }
+      if((getCExtansion!=="xlsx") && (getCExtansion!=="xls")  && (getCExtansion!=="xlsm")  && (getCExtansion!=="xlsb")  && (getCExtansion!=="doc")  && (getCExtansion!=="docx")){
+
+        setError("certificate", {
+            type: "filetype",
+            message: "Only Doc, Docx, Xls, Xlsx,Xlsm,Xlsb documents are valid."
+        });
+ 
     return;
+
+    }
+
+   
+   return
 
     }
  
@@ -160,8 +170,19 @@ export const NewReport=()=>{
     //   console.log("else block reciew ids" , standardString?.length)
     // }
     // console.log("form data",formData)
-   
+ 
     dispatch(LoaderStatus(true))
+
+    console.log("Before ProjectCreatedData: " + JSON.stringify(ProjectCreatedData))
+    console.log("Before ProjectCreatedData Key: " + ProjectCreatedData.hasOwnProperty('project_number'))
+    if(ProjectCreatedData.hasOwnProperty('project_number')){
+      setProjectCreatedData({
+        project_number:data.project_number,
+        project_name:"Dummy Testing"
+      })
+    }
+    console.log("After ProjectCreatedData: " +  JSON.stringify(ProjectCreatedData))
+    console.log("After ProjectCreatedData Key: " + ProjectCreatedData.hasOwnProperty('project_number'))
     
     axios({
 
@@ -570,7 +591,7 @@ return(
       <Controller style={{width:"200px"}}
         name="report_type"
         defaultValue={""}
-
+        {...register("report_type",{required: true})}
         control={control}
         render={({ field }) => (
         <Select  
@@ -581,15 +602,19 @@ return(
             classNamePrefix="dropdown"
             options={options}
         />
+        
         )}
     />
+     {errors.report_type && (
+            <span style={{ color: "red" }}> {errors.report?.message || "This field is required"}</span>
+          )}
     </div>
     <p>{errors.status?.message || errors.status?.label.message}</p>
-      <input className='choose_file'  type="file"  name='report' {...register("report",{required: false})} placeholder="Drag and Drop"/>
+      <input className='choose_file'  type="file"  name='report' {...register("report",{required: true})} placeholder="Drag and Drop"/>
         <i className="fas fa-cloud-upload-alt"/>
         <p className="drag_text">Max File Size: 25MB: Max Files: 1/Type: .doc,.docx,.xls,.xlsx,.xlsm,.xlsb</p>
         {errors.report && (
-            <span style={{ color: "red" }}> {errors.report?.message}</span>
+            <span style={{ color: "red" }}> {errors.report?.message || "This field is required"}</span>
           )}
     </label>
 
@@ -603,7 +628,7 @@ return(
       <Controller  style={{width:"200px !important"}}
         name="certificate_type"
         defaultValue={""}
-
+        {...register("certificate_type",{required: true})}
         control={control}
         render={({ field }) => (
         <Select 
@@ -616,8 +641,11 @@ return(
         />
         )}
     />
+    {errors.certificate_type && (
+            <span style={{ color: "red" }}> {errors.report?.message || "This field is required"}</span>
+          )}
     </div>
-    <input  type="file" className='choose_file' name='certificate' {...register("certificate",{required: false},
+    <input  type="file" className='choose_file' name='certificate' {...register("certificate",{required: true},
     // {
     //   validate: {
     //     lessThan10MB: files => files[0]?.size < 10000000 || 'Max 10MB',
@@ -634,7 +662,7 @@ return(
         <i className="fas fa-cloud-upload-alt"/>
         <p className="drag_text">Max File Size: 25MB: Max Files: 1/Type: .doc,.docx,.xls,.xlsx,.xlsm,.xlsb</p>
         {errors.certificate && (
-            <span style={{ color: "red" }}> {errors.certificate?.message}</span>
+            <span style={{ color: "red" }}> {errors.certificate?.message || "This field is required"}</span>
           )}
     </label>
  

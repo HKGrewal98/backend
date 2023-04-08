@@ -39,7 +39,11 @@ export const AssignedProjectMain = () => {
     let dispatch = useDispatch()
     useEffect(()=>{
 
-       let SelectedProject = JSON.parse(localStorage.getItem("SelectedProject"))
+       let SelectedProject
+       if (localStorage.getItem("SelectedProject")) {
+        SelectedProject = JSON.parse(localStorage.getItem("SelectedProject"));
+        // Do something with the SelectedProject object
+      }
       if(SelectedProject !== undefined){
         setSelectedProjectState(SelectedProject)
       }

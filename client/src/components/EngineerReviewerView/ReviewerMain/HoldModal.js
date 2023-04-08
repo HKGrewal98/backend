@@ -68,17 +68,17 @@ export const HoldModal = (props) => {
     
   });
   return (
-    <div id="myCustomModal" class="customModal">
-    <div class="custom-modal-content bg-warning">
-      <div class="custom-modal-header bg-warning">
+    <div id="myCustomModal" className="customModal">
+    <div className="custom-modal-content bg-warning">
+      <div className="custom-modal-header bg-warning">
         <h4 className="text-center">Hold</h4>
       </div>
-      <div class="custom-modal-body" style={{ background: "white" }}>
+      <div className="custom-modal-body" style={{ background: "white" }}>
         <div
           className="customContent d-flex align-items-center"
           style={{ border: "1px solid black", background: "white" }}
         >
-           <div class="custom-modal-body">
+           <div className="custom-modal-body">
                 <textarea
                   className="w-100 m-1 "
                   {...register("comment")}
@@ -93,7 +93,7 @@ export const HoldModal = (props) => {
               </div>
         </div>
       </div>
-      <div class="custom-modal-footer d-flex justify-content-end ">
+      <div className="custom-modal-footer d-flex justify-content-end ">
       <button className="btn m-2 btn-warning" onClick={()=>onSubmit(handleSubmit)}>
                   Put On Hold
                 </button>
