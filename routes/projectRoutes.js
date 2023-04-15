@@ -4,6 +4,7 @@ const  {check,validationResult} = require('express-validator')
 const Response = require('../service/customResponse')
 const FileType = require('../service/staticData/FileType')
 const StatusType = require('../service/staticData/StatusType')
+const inputRegex = new RegExp(/^[ A-Za-z0-9_,%$-]*$/)
 
 const projectRoute = express.Router()
 
@@ -20,14 +21,19 @@ function isEngineer(req,res,next){
 }
 
 projectRoute.post('/save',isEngineer,[
-    check("project_type","Field Required").notEmpty(),
-    check("project_name","Field Required").notEmpty(),
+    check("project_type","Field Required").notEmpty().matches(inputRegex).withMessage("Invalid characters used in specifying the value of the required field."),
+    check("project_name","Field Required").notEmpty().matches(inputRegex).withMessage("Invalid characters used in specifying the value of the required field."),
     check("client_ready","Field Required").isDate(),
     check("completion","Field Required").isDate(),
     check("start_date","Field Required").isDate(),
     check("end_date","Field Required").isDate(),
     check("receiving_customer","Field Required").notEmpty(),
-    check("transacting_customer","Field Required").notEmpty()
+    check("transacting_customer","Field Required").notEmpty(),
+    check('lab_name').matches(inputRegex).withMessage("Invalid characters used in specifying the value of the required field."),
+    check('description').matches(inputRegex).withMessage("Invalid characters used in specifying the value of the required field."),
+    check('purchase_order_number').matches(inputRegex).withMessage("Invalid characters used in specifying the value of the required field."),
+    check('product_covered').matches(inputRegex).withMessage("Invalid characters used in specifying the value of the required field."),
+    check('modals').matches(inputRegex).withMessage("Invalid characters used in specifying the value of the required field."),
 ],async (req,res)=>{
       const errors = validationResult(req);
       if(!errors.isEmpty()){

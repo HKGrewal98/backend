@@ -7,7 +7,9 @@ const path  = require('path')
 const appDir = dirname(require.main.filename)
 const reportStatus = require('../models/ReportStatus')
 const reviewerService = require('../service/reveiwerService')
-
+const {body,validationResult} = require('express-validator')
+const Response = require('../service/customResponse')
+const inputRegex = new RegExp(/^[ A-Za-z0-9_,%$-]*$/)
 
 
 const reportRoute = express.Router()
@@ -35,7 +37,19 @@ reportRoute.post('/additional/doc',editUpload,async (req,res) => {
       return await reportService.addAdditionalDocuments(req,res)
 })
 
-reportRoute.post('/',reportUpload,isEngineer,async (req,res)=>{ 
+reportRoute.post('/',reportUpload,isEngineer,[
+      body("tags","Field Required").notEmpty().matches(inputRegex).withMessage("Invalid characters used in specifying the value of the required field."),
+      body("comments","Field Required").notEmpty().matches(inputRegex).withMessage("Invalid characters used in specifying the value of the required field."),
+      body("products_covered","Field Required").notEmpty().matches(inputRegex).withMessage("Invalid characters used in specifying the value of the required field."),
+      body("models","Field Required").notEmpty().matches(inputRegex).withMessage("Invalid characters used in specifying the value of the required field."),
+      body("report_name","Field Required").notEmpty().matches(inputRegex).withMessage("Invalid characters used in specifying the value of the required field."),
+],async (req,res)=>{ 
+
+      const errors = validationResult(req);
+      if(!errors.isEmpty()){
+        return res.status(400).json((new Response(400,"FAILURE","Validation Errors",{ errors: errors.array() })).getSuccessObject());
+      }
+      
       console.log(req.files['report'])
       return await reportService.saveReport(req,res)
 })

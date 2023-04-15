@@ -146,12 +146,34 @@ async function getManufactureNameOrId(name,id){
  }
 
 
- async function getUserByNameOrId(name,id){
+ async function getUserByNameOrId(name,id,indentityType){
      
     if(!name && !id){
-        return new Response(400,"SUCCESS","name and id field missing in req query params.",null)
+        return new Response(400,"FAILURE","name and id field missing in req query params.",null)
     }
 
+    let indentityFilter = {}
+    switch(parseInt(indentityType)){
+        case 1: {
+            indentityFilter = {is_engineer:{[Op.eq]:true}}
+            break;
+        }
+        case 2 : {
+            indentityFilter = {is_reviewer:{[Op.eq]:true}}
+            break;
+        }
+        case 3: {
+            indentityFilter = {[Op.or] :[
+                {is_engineer:{[Op.eq]:true}},
+                {is_reviewer:{[Op.eq]:true}}
+            ]}
+            break;
+        }
+        default:{
+            return new Response(400,"FAILURE","IndentityType field missing in req query params.",null)
+        }
+    }
+     console.log(indentityFilter)
     try{
      if(name){
          name = name.toLowerCase()
@@ -165,7 +187,8 @@ async function getManufactureNameOrId(name,id){
                 {name:{[Op.like]:`%${name}%`}},
                 {name:{[Op.like]:`%${name}`}},
                 {id:{[Op.eq]:`${id}`}}
-             ]
+             ],
+             [Op.and]:indentityFilter
          },
          attributes:['id','name','is_engineer','is_reviewer'],
      },{raw:true})

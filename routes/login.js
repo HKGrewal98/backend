@@ -118,8 +118,8 @@ loginApp.get('/merchant',authenticate,async (req,res)=>{
 })
 
 loginApp.get('/search',authenticate,async (req,res)=>{
-    const {name,id} = req.query
-    const response = await db.getUserByNameOrId(name,id);
+    const {name,id,indentityType} = req.query
+    const response = await db.getUserByNameOrId(name,id,indentityType);
     return createResponse(response,res)
 })
 
