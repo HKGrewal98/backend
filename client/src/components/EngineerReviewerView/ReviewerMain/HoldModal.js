@@ -19,7 +19,7 @@ export const HoldModal = (props) => {
   myHeaders.append("Access-Control-Allow-Credentials", true);
 
   const onSubmit= ((data) => {
-    // console.log(data)
+    // console.log("reject data",data)
     axios({
       method: 'post',
       maxBodyLength: Infinity,
@@ -69,39 +69,42 @@ export const HoldModal = (props) => {
   });
   return (
     <div id="myCustomModal" className="customModal">
-    <div className="custom-modal-content bg-warning">
+    <div className="custom-modal-content">
       <div className="custom-modal-header bg-warning">
-        <h4 className="text-center">Hold</h4>
+        <h4 className="text-start p-2">Put On Hold</h4>
       </div>
-      <div className="custom-modal-body" style={{ background: "white" }}>
+      <div className="custom-modal-body">
+       
+      
         <div
-          className="customContent d-flex align-items-center"
-          style={{ border: "1px solid black", background: "white" }}
+          className="d-flex flex-column mt-2"
+          style={{
+            border: "1px solid rgb(0, 123, 255 ",
+            borderRadius: "6.7px",
+          }}
         >
-           <div className="custom-modal-body">
-                <textarea
-                  className="w-100 m-1 "
-                  {...register("comment")}
-                  style={{
-                    backgroundColor: "white",
-                    border: "1px solid #007bff",
-                    borderRadius: "6.7px",
-                    height: "6.7rem",
-                  }}
-                />
-                *Comments
-              </div>
+          
+          <textarea
+            className="m-2"
+            {...register("comment")}
+            placeholder="*Comments"
+            style={{
+              border: "1px solid rgb(0, 123, 255",
+              borderRadius: "6.7px",
+            }}
+          ></textarea>
         </div>
       </div>
       <div className="custom-modal-footer d-flex justify-content-end ">
-      <button className="btn m-2 btn-warning" onClick={()=>onSubmit(handleSubmit)}>
-                  Put On Hold
-                </button>
-            
+        <button className="btn btn-warning m-2" onClick={
+          handleSubmit(onSubmit)
+        }>
+          Put On Hold
+        </button>
         <button
           className="btn m-2 btn-dark"
           onClick={() => {
-           props.hideHoldModal(false)
+            props.hideModalApprove(false)
           }}
         >
           Cancel

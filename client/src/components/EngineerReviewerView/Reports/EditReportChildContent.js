@@ -71,7 +71,7 @@ export const EditReportChildContent = (props) => {
     
   });
   const updateData = async (data)=>{
-    console.log("sending data", data)
+    // console.log("sending data", data)
     dispatch(LoaderStatus(true))
    await axios({
       method: 'post',
@@ -145,14 +145,8 @@ export const EditReportChildContent = (props) => {
     <div className="review">
      
       <div className="ProjectNumber">
-        <section>Project Number <span style={{cursor:"pointer"}} onClick={()=>setInputDisabledState(!inputDisabledState)}><EditSvg /></span></section>
-        {/* <input type="text" className="form-control" autoComplete='off' id="projectNumber" 
-   placeholder={ReportsDetailsRedux?.project?.project_number || ReportsDetailsRedux?.report?.project_number}
-  style={{width:"120%",borderTop:"0", borderLeft:"0", borderRight:"0", fontSize:"1rem", borderBottom:"1px solid grey"}}
-  
-   disabled
- 
-  /> */}
+        <section>Project Number </section>
+      
    <input
           type="text"
           placeholder={
@@ -162,64 +156,7 @@ export const EditReportChildContent = (props) => {
           disabled
 
         ></input>
-        {/* <div className='parentSearchResult'>
-  <input type="text" className="form-control" autoComplete='off' id="projectNumber" 
-   placeholder={ReportsDetailsRedux?.project?.project_number || ReportsDetailsRedux?.report?.project_number}
-  style={{width:"120%",borderTop:"0", borderLeft:"0", borderRight:"0", fontSize:"1rem", borderBottom:"1px solid grey"}}
-  
-   disabled
-  {...register("project_number")}
-   onChange={debounce(async (e) => {
-    let str = e.target.value
-    // console.log("str check", str)
-    let data={
-      name: str
-    }
-    axios({
-      method: 'get',
-      maxBodyLength: Infinity,
-      url: `${BACKEND_URL}/project`,
-        params : data,
       
-        credentials: "include", 
-        withCredentials:true,
-    })
-    .then(function (response) {
-      // console.log(response.data);
-      if(response.data?.data.length>0){
-
-        setSearchResults2(response.data?.data)
-      }
-      else{
-        setSearchResults2([])
-      }
-     
-    })
-    .catch(function (error) {
-      console.log("Error block", error);
-     
-    });
-  }, 800)}
-  />
-   {errors.project_number && <span style={{color:"red"}}>This field is required</span>}
-   <div className='searchResultsContainer'>
-            {searchResults2?.length>0? 
-              <div className='searchResults'>
-            {searchResults2?.length>0? searchResults2.map((result,index)=>{
-             
-                
-                return <div key={index} className='searchItem' onClick={()=>{
-                  document.getElementById("projectNumber").value = result.project_number;
-                  document.getElementById("projectNumber").focus();
-                  setProjectCreatedData({"project_number":result?.project_number,"project_name":result?.project_name})
-                  setSearchResults2([])
-                }}>{result?.project_number}- {result?.project_name}</div>
-                
-              
-            }):""
-          }</div>:""}
-          </div>
-</div> */}
         
       </div>
      
@@ -314,7 +251,8 @@ export const EditReportChildContent = (props) => {
               let str = e.target.value
               // console.log("str check", str)
               let data={
-                name: str
+                name: str,
+                indentityType:2
               }
               axios({
                 method: 'get',
@@ -375,7 +313,8 @@ export const EditReportChildContent = (props) => {
             let str = e.target.value
             // console.log("str check", str)
             let data={
-              name: str
+              name: str,
+              indentityType:3
             }
             axios({
               method: 'get',
@@ -388,7 +327,7 @@ export const EditReportChildContent = (props) => {
             })
             .then(function (response) {
               // console.log(response.data);
-              if(response.data?.data.length>0){
+              if(response.data?.data?.length>0){
         
                 setSearchResults(response.data?.data)
               }

@@ -22,7 +22,7 @@ export const NewReport=()=>{
 
  
   const [name,setName] = useState("")
-  const [ProjectCreatedData, setProjectCreatedData] = useState({})
+  const [ProjectCreatedData, setProjectCreatedData] = useState()
 
   
   const [close,setClose] = useState(false)
@@ -82,7 +82,7 @@ export const NewReport=()=>{
   const onSubmit = ((data) => {
   
     let stID = filteredIds(data)
-    console.log("Date", data)
+    // console.log("Date", data)
   
     let standardString = stID.toString()
     // console.log(standardString)
@@ -143,7 +143,7 @@ export const NewReport=()=>{
 
     }
  
-  
+    // console.log("data check pn", data)
     let formData = new FormData()
     formData.append('issued_at', data.issued_at);
     formData.append('tags', data.tags);
@@ -170,19 +170,8 @@ export const NewReport=()=>{
     //   console.log("else block reciew ids" , standardString?.length)
     // }
     // console.log("form data",formData)
- 
+   
     dispatch(LoaderStatus(true))
-
-    console.log("Before ProjectCreatedData: " + JSON.stringify(ProjectCreatedData))
-    console.log("Before ProjectCreatedData Key: " + ProjectCreatedData.hasOwnProperty('project_number'))
-    if(ProjectCreatedData.hasOwnProperty('project_number')){
-      setProjectCreatedData({
-        project_number:data.project_number,
-        project_name:"Dummy Testing"
-      })
-    }
-    console.log("After ProjectCreatedData: " +  JSON.stringify(ProjectCreatedData))
-    console.log("After ProjectCreatedData Key: " + ProjectCreatedData.hasOwnProperty('project_number'))
     
     axios({
 
@@ -203,8 +192,9 @@ export const NewReport=()=>{
         reset(defaultValues)
         setShowGreen(true)
         setAlertValue(res?.data?.message)
-       
-        localStorage.setItem("SelectedProject", JSON.stringify(ProjectCreatedData))
+        setProjectCreatedData({"project_name":data.project_name, "project_number":data.project_number})
+        let errorFixSP = {"project_name":data.project_name, "project_number":data.project_number}
+        localStorage.setItem("SelectedProject", JSON.stringify(errorFixSP))
       dispatch(ProjectNumber(ProjectCreatedData))
         
 
@@ -329,7 +319,8 @@ return(
     let str = e.target.value
     // console.log("str check", str)
     let data={
-      name: str
+      name: str,
+      indentityType:3
     }
     axios({
       method: 'get',
@@ -461,7 +452,8 @@ return(
     let str = e.target.value
     // console.log("str check", str)
     let data={
-      name: str
+      name: str,
+      indentityType:2
     }
     axios({
       method: 'get',

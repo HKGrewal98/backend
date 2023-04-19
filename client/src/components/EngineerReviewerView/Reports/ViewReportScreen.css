@@ -216,7 +216,7 @@ border-right: 0px;
 
   .searchResults{
     position: absolute;
-    /* top: 4rem; */
+    top: 4rem;
     background-color: white;
     border: 1.5px solid #007D99;
     z-index: 9;

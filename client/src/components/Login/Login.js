@@ -156,6 +156,7 @@ export const Login = () => {
               className="form-control"
               placeholder="Enter User ID"
               aria-describedby="emailHelp"
+              autoComplete="off"
               {...register("userId",{
                 required: true})}
             />
@@ -167,6 +168,7 @@ export const Login = () => {
               type="password"
               className="form-control"
               placeholder="Enter Password"
+              autoComplete="off"
               {...register("password",{
                 required: true})}
             />

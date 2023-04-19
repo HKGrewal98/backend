@@ -7,7 +7,7 @@ import { Navbar } from "./components/Common/Navbar/Navbar";
 import { BrowserRouter, Routes, Route, useRoutes } from "react-router-dom";
 import { Login } from "./components/Login/Login";
 import { Footer } from "./components/Common/Footer/Footer";
-import { ComplianceCentralUsers } from "./components/ComplianceCentralUsers/ComplianceCentralUsers";
+
 import { LandingPage } from "./components/EngineerReviewerView/LandingPage/LandingPage";
 import CreateProjectFolder from "./components/EngineerReviewerView/EngineerMain/CreateProjectFolder";
 
@@ -47,7 +47,7 @@ function App() {
 
 
         <Route path="view/landingPage" element={<LandingPage />} />
-        <Route path="/complianceCentralUsers" element={<ComplianceCentralUsers />} />
+      
         <Route path="view/createProjectFolder" element={<CreateProjectFolder />} />
 
         {/* Nested Routes */}

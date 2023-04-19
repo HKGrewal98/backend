@@ -18,7 +18,7 @@ export const ApproveModal = (props) => {
   myHeaders.append("Access-Control-Allow-Credentials", true);
 
   const onSubmit= ((data) => {
-    // console.log(data)
+    // console.log("approve check", data)
     axios({
       method: 'post',
       maxBodyLength: Infinity,

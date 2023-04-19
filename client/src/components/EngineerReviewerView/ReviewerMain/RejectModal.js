@@ -19,7 +19,7 @@ export const RejectModal = (props) => {
   myHeaders.append("Access-Control-Allow-Credentials", true);
 
   const onSubmit= ((data) => {
-    // console.log(data)
+    // console.log("reject check",data)
     axios({
       method: 'post',
       maxBodyLength: Infinity,
@@ -69,37 +69,48 @@ export const RejectModal = (props) => {
   });
   return (
     <div id="myCustomModal" className="customModal">
-            <div className="custom-modal-content">
-              <div className="custom-modal-header bg-danger">
-                <h4 className="text-start">Reject Review</h4>
-              </div>
-              <div className="custom-modal-body">
-                <textarea
-                  className="w-100 m-1 "
-                  {...register("comment")}
-                  style={{
-                    backgroundColor: "white",
-                    border: "1px solid #007bff",
-                    borderRadius: "6.7px",
-                    height: "6.7rem",
-                  }}
-                />
-                *Comments
-              </div>
-              <div className="custom-modal-footer d-flex justify-content-end ">
-                <button className="btn m-2 btn-danger" onClick={()=>onSubmit(handleSubmit)}>
-                  Reject Review
-                </button>
-                <button
-                  className="btn m-2 btn-dark"
-                  onClick={() => {
-                    props.hideRejectModal(false)
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
+              <div className="custom-modal-content">
+      <div className="custom-modal-header bg-danger">
+        <h4 className="text-start p-2">Reject</h4>
+      </div>
+      <div className="custom-modal-body">
+       
+      
+        <div
+          className="d-flex flex-column mt-2"
+          style={{
+            border: "1px solid rgb(0, 123, 255 ",
+            borderRadius: "6.7px",
+          }}
+        >
+          
+          <textarea
+            className="m-2"
+            {...register("comment")}
+            placeholder="*Comments"
+            style={{
+              border: "1px solid rgb(0, 123, 255",
+              borderRadius: "6.7px",
+            }}
+          ></textarea>
+        </div>
+      </div>
+      <div className="custom-modal-footer d-flex justify-content-end ">
+        <button className="btn btn-danger m-2" onClick={
+          handleSubmit(onSubmit)
+        }>
+          Reject
+        </button>
+        <button
+          className="btn m-2 btn-dark"
+          onClick={() => {
+            props.hideModalApprove(false)
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
           </div>
   )
 }

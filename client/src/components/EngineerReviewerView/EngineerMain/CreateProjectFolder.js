@@ -55,7 +55,7 @@ const CreateProjectFolder = () => {
         withCredentials:true,
     })
     .then(function (response) {
-      console.log(JSON.stringify(response.data));
+      // console.log(JSON.stringify(response.data));
       if(response.data.statusCode===200){
         setShowModalGreen(true)
         setProjectCreatedData({"project_number":response.data?.data?.id,"project_name":data.project_name})
@@ -263,7 +263,8 @@ const CreateProjectFolder = () => {
               let str = e.target.value
               // console.log("str check", str)
               let data={
-                name: str
+                name: str,
+                indentityType: 3
               }
               axios({
                 method: 'get',
